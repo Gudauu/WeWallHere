@@ -1,6 +1,7 @@
 package com.example.wewallhere.Upload;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,6 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 
 import java.io.IOException;
@@ -52,8 +54,11 @@ import retrofit2.Retrofit;
 public class UploadActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_PICK = 1;
+    private static final int REQUEST_SELECT_VIDEO = 1001;
+
 
     private Button selectImageButton;
+    private Button selectVideoButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +69,19 @@ public class UploadActivity extends AppCompatActivity {
         selectImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestImageFromAlbum();
+                selectImageFromAlbum();
+            }
+        });
+        selectVideoButton = findViewById(R.id.select_video_button);
+        selectVideoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectVideoFromGallery();
             }
         });
     }
 
-    private void requestImageFromAlbum() {
+    private void selectImageFromAlbum() {
         // Check if the required permission to read external storage is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -79,13 +91,46 @@ public class UploadActivity extends AppCompatActivity {
                     REQUEST_IMAGE_PICK);
         } else {
             // Permission already granted, start the image picker
-            startImagePicker();
+            startImagePickerIntent();
+        }
+    }
+    private void selectVideoFromGallery() {
+        // Check if the necessary permissions are granted
+        if (checkVideoPermission()) {
+            // Permissions are already granted, open the video selection intent
+            startVideoPickerIntent();
+        } else {
+            // Request the necessary permissions
+            String[] permissions = new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA
+            };
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_SELECT_VIDEO);
         }
     }
 
-    private void startImagePicker() {
+    private boolean checkVideoPermission() {
+        // Check if the required permissions are granted
+        int readStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int writeStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int cameraPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+
+        return readStoragePermission == PackageManager.PERMISSION_GRANTED &&
+                writeStoragePermission == PackageManager.PERMISSION_GRANTED &&
+                cameraPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void startImagePickerIntent() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_IMAGE_PICK);
+    }
+
+    private void startVideoPickerIntent() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("video/*");
+        startActivityForResult(intent, REQUEST_SELECT_VIDEO);
     }
 
     @Override
@@ -94,12 +139,33 @@ public class UploadActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_PICK) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, start the image picker
-                startImagePicker();
+                startImagePickerIntent();
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == REQUEST_SELECT_VIDEO) {
+            // Check if all required permissions are granted
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+
+            if (allPermissionsGranted) {
+                // All permissions are granted, open the video selection intent
+                startVideoPickerIntent();
+            } else {
+                // Permissions are not granted, show a message or take appropriate action
+                Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
+
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -108,7 +174,27 @@ public class UploadActivity extends AppCompatActivity {
             Uri selectedImageUri = data.getData();
             // Now you have the selected image URI, you can upload it to the server
             uploadImageToServer(selectedImageUri);
+        }else if (requestCode == REQUEST_SELECT_VIDEO && resultCode == RESULT_OK && data != null) {
+            Uri selectedVideoUri = data.getData();
+            uploadVideoToServer(selectedVideoUri);
         }
+    }
+    private String getVideoFilePath(Uri uri) {
+        String realPath = "";
+        Cursor cursor = null;
+        try {
+            String[] projection = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(uri, projection, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                realPath = cursor.getString(columnIndex);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return realPath;
     }
     private String getImageFilePath(Uri imageUri) {
         String filePath = null;
@@ -130,8 +216,6 @@ public class UploadActivity extends AppCompatActivity {
 
         // Example code:
         try {
-            Toast.makeText(UploadActivity.this, "upload!", Toast.LENGTH_SHORT).show();
-
             // Resolve the image URI to a file path
             String filePath = getImageFilePath(imageUri);
 
@@ -149,7 +233,6 @@ public class UploadActivity extends AppCompatActivity {
             ApiService apiService = retrofit.create(ApiService.class);
 
             // Create a file from the image URI
-//            File imageFile = new File(imageUri.getPath());
             File imageFile = new File(filePath);
 
             // Create a request body with the image file
@@ -182,5 +265,53 @@ public class UploadActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    private void uploadVideoToServer(Uri videoUri){
+        try{
+            ToastHelper.showLongToast(getApplicationContext(), "video upload!",Toast.LENGTH_SHORT);
+
+            // Create a file object from the video URI
+            File videoFile = new File(getVideoFilePath(videoUri));
+
+            // Create a request body with the video file
+            RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), videoFile);
+
+            // Create a multipart request body part with the request body
+            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("video", videoFile.getName(), requestBody);
+
+            // Create the Retrofit instance
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://54.252.196.140:3001")
+                    .build();
+
+            // Create the API service interface
+            ApiService apiService = retrofit.create(ApiService.class);
+
+            // Create the API call to upload the video
+            Call<ResponseBody> call = apiService.uploadVideo(videoPart);
+
+            // Enqueue the API call
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Video uploaded successfully
+                        Toast.makeText(UploadActivity.this, "Video uploaded successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Video upload failed
+                        Toast.makeText(UploadActivity.this, "Video upload failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Handle the upload failure
+                    ToastHelper.showLongToast(UploadActivity.this, "Video upload failed: " + t.getMessage(), Toast.LENGTH_LONG);
+                }
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

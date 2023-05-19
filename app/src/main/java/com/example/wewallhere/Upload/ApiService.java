@@ -11,5 +11,10 @@ public interface ApiService {
     @Multipart
     @POST("/upload") // Replace with your server's upload endpoint
     Call<ResponseBody> uploadImage(@Part MultipartBody.Part image);
+
+    @Multipart
+    @POST("/upload") // Replace with your server's upload endpoint
+    Call<ResponseBody> uploadVideo(@Part MultipartBody.Part video);
 }
+
 

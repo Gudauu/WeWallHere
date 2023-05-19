@@ -12,10 +12,18 @@
         android:id="@+id/select_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload"
+        android:text="Upload image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/select_video_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload video"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/select_image_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
