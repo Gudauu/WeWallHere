@@ -1,8 +1,10 @@
 package com.example.wewallhere.Upload;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -108,6 +110,18 @@ public class UploadActivity extends AppCompatActivity {
             uploadImageToServer(selectedImageUri);
         }
     }
+    private String getImageFilePath(Uri imageUri) {
+        String filePath = null;
+        String[] projection = {MediaStore.Images.Media.DATA};
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = contentResolver.query(imageUri, projection, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            filePath = cursor.getString(columnIndex);
+            cursor.close();
+        }
+        return filePath;
+    }
 
     private void uploadImageToServer(Uri imageUri) {
         // Implement the logic to upload the image to the server here
@@ -118,6 +132,14 @@ public class UploadActivity extends AppCompatActivity {
         try {
             Toast.makeText(UploadActivity.this, "upload!", Toast.LENGTH_SHORT).show();
 
+            // Resolve the image URI to a file path
+            String filePath = getImageFilePath(imageUri);
+
+            if (filePath == null) {
+                Toast.makeText(this, "Failed to get image file path", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Create a Retrofit instance
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("http://54.252.196.140:3000") // Replace with your server's IP address
@@ -127,7 +149,8 @@ public class UploadActivity extends AppCompatActivity {
             ApiService apiService = retrofit.create(ApiService.class);
 
             // Create a file from the image URI
-            File imageFile = new File(imageUri.getPath());
+//            File imageFile = new File(imageUri.getPath());
+            File imageFile = new File(filePath);
 
             // Create a request body with the image file
             RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
@@ -146,6 +169,7 @@ public class UploadActivity extends AppCompatActivity {
                     } else {
                         // Handle error response
                         Toast.makeText(UploadActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                        ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
                     }
                 }
 
