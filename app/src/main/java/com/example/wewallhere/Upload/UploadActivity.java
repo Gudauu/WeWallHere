@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.File;
 import java.io.IOException;
 
 import android.Manifest;
@@ -35,6 +36,16 @@ import androidx.core.content.ContextCompat;
 import com.example.wewallhere.R;
 
 import java.io.IOException;
+
+import Helper.ToastHelper;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class UploadActivity extends AppCompatActivity {
 
@@ -107,9 +118,43 @@ public class UploadActivity extends AppCompatActivity {
         try {
             Toast.makeText(UploadActivity.this, "upload!", Toast.LENGTH_SHORT).show();
 
-            // Convert the imageUri to a File object or extract the file path from the URI
-            // Then send the file to the server using an HTTP request
-            // Make sure to handle the response from the server and show appropriate messages to the user
+            // Create a Retrofit instance
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://54.252.196.140:3000") // Replace with your server's IP address
+                    .build();
+
+            // Create an instance of the API service interface
+            ApiService apiService = retrofit.create(ApiService.class);
+
+            // Create a file from the image URI
+            File imageFile = new File(imageUri.getPath());
+
+            // Create a request body with the image file
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
+
+            // Create a MultipartBody.Part from the request body
+            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), requestFile);
+
+            // Send the image file to the server
+            Call<ResponseBody> call = apiService.uploadImage(imagePart);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Image uploaded successfully
+                        Toast.makeText(UploadActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Handle error response
+                        Toast.makeText(UploadActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Handle network failure
+                    ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
