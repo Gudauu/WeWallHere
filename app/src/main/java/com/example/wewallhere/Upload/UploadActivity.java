@@ -267,7 +267,8 @@ public class UploadActivity extends AppCompatActivity {
     private void uploadVideoToServer(Uri videoUri){
         try{
             // Create a file object from the video URI
-            File videoFile = new File(getVideoFilePath(videoUri));
+            String filePath = getVideoFilePath(videoUri);
+            File videoFile = new File(filePath);
 
             // Create a request body with the video file
             RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), videoFile);
