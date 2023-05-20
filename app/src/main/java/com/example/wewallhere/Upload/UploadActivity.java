@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,6 +42,8 @@ import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
 
 import Helper.ToastHelper;
 import okhttp3.MediaType;
@@ -180,19 +183,6 @@ public class UploadActivity extends AppCompatActivity {
             uploadVideoToServer(selectedVideoUri);
         }
     }
-    private String getVideoFilePath(Uri videoUri) {
-        String filePath = null;
-        String[] projection = {MediaStore.Video.Media.DATA};
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = contentResolver.query(videoUri, projection, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-            filePath = cursor.getString(columnIndex);
-            cursor.close();
-        }
-        return filePath;
-    }
-
 
     private String getImageFilePath(Uri imageUri) {
         String filePath = null;
@@ -208,19 +198,11 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     private void uploadImageToServer(Uri imageUri) {
-        // Implement the logic to upload the image to the server here
-        // You can use libraries like Retrofit or Volley to make the HTTP request to the server
-        // Include the imageUri as a parameter in the request
-
-        // Example code:
         try {
-            // Resolve the image URI to a file path
-            String filePath = getImageFilePath(imageUri);
-
-            if (filePath == null) {
-                Toast.makeText(this, "Failed to get image file path", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), getBytesFromInputStream(inputStream));
+            String fileName = "image_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
+            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", fileName, requestBody);
 
             // Create a Retrofit instance
             Retrofit retrofit = new Retrofit.Builder()
@@ -229,15 +211,6 @@ public class UploadActivity extends AppCompatActivity {
 
             // Create an instance of the API service interface
             ApiService apiService = retrofit.create(ApiService.class);
-
-            // Create a file from the image URI
-            File imageFile = new File(filePath);
-
-            // Create a request body with the image file
-            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
-
-            // Create a MultipartBody.Part from the request body
-            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", imageFile.getName(), requestFile);
 
             // Send the image file to the server
             Call<ResponseBody> call = apiService.uploadImage(imagePart);
@@ -264,17 +237,24 @@ public class UploadActivity extends AppCompatActivity {
             ToastHelper.showLongToast(UploadActivity.this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_LONG);
         }
     }
+
+    // helper function in video upload
+    private byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        byte[] buffer = new byte[4 * 1024]; // Adjust the buffer size as needed
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, bytesRead);
+        }
+        return byteBuffer.toByteArray();
+    }
+
     private void uploadVideoToServer(Uri videoUri){
         try{
-            // Create a file object from the video URI
-            String filePath = getVideoFilePath(videoUri);
-            File videoFile = new File(filePath);
-
-            // Create a request body with the video file
-            RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), videoFile);
-
-            // Create a multipart request body part with the request body
-            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("file", videoFile.getName(), requestBody);
+            InputStream inputStream = getContentResolver().openInputStream(videoUri);
+            RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), getBytesFromInputStream(inputStream));
+            String fileName = "video_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
+            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("file", fileName, requestBody);
 
             // Create the Retrofit instance
             Retrofit retrofit = new Retrofit.Builder()
