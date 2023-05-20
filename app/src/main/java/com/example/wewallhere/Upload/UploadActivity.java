@@ -3,6 +3,7 @@ package com.example.wewallhere.Upload;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -179,23 +180,20 @@ public class UploadActivity extends AppCompatActivity {
             uploadVideoToServer(selectedVideoUri);
         }
     }
-    private String getVideoFilePath(Uri uri) {
-        String realPath = "";
-        Cursor cursor = null;
-        try {
-            String[] projection = {MediaStore.Images.Media.DATA};
-            cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                realPath = cursor.getString(columnIndex);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+    private String getVideoFilePath(Uri videoUri) {
+        String filePath = null;
+        String[] projection = {MediaStore.Video.Media.DATA};
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = contentResolver.query(videoUri, projection, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            filePath = cursor.getString(columnIndex);
+            cursor.close();
         }
-        return realPath;
+        return filePath;
     }
+
+
     private String getImageFilePath(Uri imageUri) {
         String filePath = null;
         String[] projection = {MediaStore.Images.Media.DATA};
@@ -239,7 +237,7 @@ public class UploadActivity extends AppCompatActivity {
             RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
 
             // Create a MultipartBody.Part from the request body
-            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), requestFile);
+            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", imageFile.getName(), requestFile);
 
             // Send the image file to the server
             Call<ResponseBody> call = apiService.uploadImage(imagePart);
@@ -263,13 +261,11 @@ public class UploadActivity extends AppCompatActivity {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            ToastHelper.showLongToast(UploadActivity.this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_LONG);
         }
     }
     private void uploadVideoToServer(Uri videoUri){
         try{
-            ToastHelper.showLongToast(getApplicationContext(), "video upload!",Toast.LENGTH_SHORT);
-
             // Create a file object from the video URI
             File videoFile = new File(getVideoFilePath(videoUri));
 
@@ -277,11 +273,11 @@ public class UploadActivity extends AppCompatActivity {
             RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), videoFile);
 
             // Create a multipart request body part with the request body
-            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("video", videoFile.getName(), requestBody);
+            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("file", videoFile.getName(), requestBody);
 
             // Create the Retrofit instance
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://54.252.196.140:3001")
+                    .baseUrl("http://54.252.196.140:3000")
                     .build();
 
             // Create the API service interface
@@ -299,7 +295,7 @@ public class UploadActivity extends AppCompatActivity {
                         Toast.makeText(UploadActivity.this, "Video uploaded successfully", Toast.LENGTH_SHORT).show();
                     } else {
                         // Video upload failed
-                        Toast.makeText(UploadActivity.this, "Video upload failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UploadActivity.this, "video upload failed:", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -310,7 +306,8 @@ public class UploadActivity extends AppCompatActivity {
                 }
             });
         } catch (Exception e){
-            e.printStackTrace();
+            ToastHelper.showLongToast(UploadActivity.this, "Video upload failed:" + e, Toast.LENGTH_LONG);
+
         }
 
     }
