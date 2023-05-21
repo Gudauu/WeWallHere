@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.gmaps.SingleLocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,15 +60,21 @@ public class UploadActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_PICK = 1;
     private static final int REQUEST_SELECT_VIDEO = 1001;
+    private static final int REQUEST_SINGLE_LOCATION = 1002;
+
+    private SingleLocation singleLocation;
 
 
     private Button selectImageButton;
     private Button selectVideoButton;
+    private  Button testSingleLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
+
+        singleLocation = new SingleLocation(this);
 
         selectImageButton = findViewById(R.id.select_image_button);
         selectImageButton.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +90,15 @@ public class UploadActivity extends AppCompatActivity {
                 selectVideoFromGallery();
             }
         });
+
+        testSingleLocationButton = findViewById(R.id.fetch_single_location);
+        testSingleLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchSingleLocation();
+            }
+        });
+
     }
 
     private void selectImageFromAlbum() {
@@ -113,6 +129,18 @@ public class UploadActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_SELECT_VIDEO);
         }
     }
+    private void fetchSingleLocation() {
+        if (checkSingleLocationPermission()) {
+            singleLocation.getLocation();
+        } else {
+            // Request the necessary permissions
+            String[] permissions = new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            };
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_SINGLE_LOCATION);
+        }
+    }
 
     private boolean checkVideoPermission() {
         // Check if the required permissions are granted
@@ -123,6 +151,14 @@ public class UploadActivity extends AppCompatActivity {
         return readStoragePermission == PackageManager.PERMISSION_GRANTED &&
                 writeStoragePermission == PackageManager.PERMISSION_GRANTED &&
                 cameraPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean checkSingleLocationPermission(){
+        int fine_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarse_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        return fine_location == PackageManager.PERMISSION_GRANTED &&
+                coarse_location == PackageManager.PERMISSION_GRANTED;
     }
 
     private void startImagePickerIntent() {
@@ -156,13 +192,17 @@ public class UploadActivity extends AppCompatActivity {
                     break;
                 }
             }
-
             if (allPermissionsGranted) {
-                // All permissions are granted, open the video selection intent
                 startVideoPickerIntent();
             } else {
-                // Permissions are not granted, show a message or take appropriate action
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
+            }
+        }else if (requestCode == REQUEST_SINGLE_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                singleLocation.getLocation();
+            } else {
+                ToastHelper.showLongToast(getApplicationContext(), "Location permissions not granted.", Toast.LENGTH_LONG);
             }
         }
     }
@@ -184,18 +224,6 @@ public class UploadActivity extends AppCompatActivity {
         }
     }
 
-    private String getImageFilePath(Uri imageUri) {
-        String filePath = null;
-        String[] projection = {MediaStore.Images.Media.DATA};
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = contentResolver.query(imageUri, projection, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            filePath = cursor.getString(columnIndex);
-            cursor.close();
-        }
-        return filePath;
-    }
 
     private void uploadImageToServer(Uri imageUri) {
         try {
