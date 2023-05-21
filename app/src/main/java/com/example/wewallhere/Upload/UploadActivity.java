@@ -59,16 +59,14 @@ import retrofit2.Retrofit;
 
 public class UploadActivity extends AppCompatActivity implements SingleLocation.LocationCallback {
 
-    private static final int REQUEST_IMAGE_PICK = 1;
-    private static final int REQUEST_SELECT_VIDEO = 1001;
-    private static final int REQUEST_SINGLE_LOCATION = 1002;
+    private static final int REQUEST_IMAGE_PICK_SEND = 1301;
+    private static final int REQUEST_VIDEO_PICK_SEND = 1302;
 
     private SingleLocation singleLocation;
 
 
     private Button selectImageButton;
     private Button selectVideoButton;
-    private  Button testSingleLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,41 +79,29 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         selectImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImageFromAlbum();
+                selectImagePermissionCheck();
             }
         });
         selectVideoButton = findViewById(R.id.select_video_button);
         selectVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectVideoFromGallery();
+                selectVideoPermissionCheck();
             }
         });
 
-        testSingleLocationButton = findViewById(R.id.fetch_single_location);
-        testSingleLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fetchSingleLocation();
-            }
-        });
+//        testSingleLocationButton = findViewById(R.id.fetch_single_location);
+//        testSingleLocationButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                fetchSingleLocation();
+//            }
+//        });
 
     }
 
 
     ////// location
-    private void fetchSingleLocation() {
-        if (checkSingleLocationPermission()) {
-            singleLocation.getLocation(UploadActivity.this);
-        } else {
-            // Request the necessary permissions
-            String[] permissions = new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            };
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_SINGLE_LOCATION);
-        }
-    }
     @Override
     public void onLocationReceived(double latitude, double longitude) {
         // Handle the received latitude and longitude
@@ -134,15 +120,8 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_IMAGE_PICK) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, start the image picker
-                startImagePickerIntent();
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == REQUEST_SELECT_VIDEO) {
-            // Check if all required permissions are granted
+        if (requestCode == REQUEST_IMAGE_PICK_SEND || requestCode == REQUEST_VIDEO_PICK_SEND) {
+            // Check if all required permissions are granted, including media & location
             boolean allPermissionsGranted = true;
             for (int grantResult : grantResults) {
                 if (grantResult != PackageManager.PERMISSION_GRANTED) {
@@ -151,16 +130,13 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                 }
             }
             if (allPermissionsGranted) {
-                startVideoPickerIntent();
+                if (requestCode == REQUEST_IMAGE_PICK_SEND){
+                    startVideoPickerIntent();
+                }else if (requestCode == REQUEST_VIDEO_PICK_SEND){
+                    startImagePickerIntent();
+                }
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
-            }
-        }else if (requestCode == REQUEST_SINGLE_LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                singleLocation.getLocation(UploadActivity.this);
-            } else {
-                ToastHelper.showLongToast(getApplicationContext(), "Location permissions not granted.", Toast.LENGTH_LONG);
             }
         }
     }
@@ -168,22 +144,23 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
 
     ////// media
     // media: check permission Select image & video from gallery
-    private void selectImageFromAlbum() {
+    private void selectImagePermissionCheck() {
         // Check if the required permission to read external storage is granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission not granted, request it
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_IMAGE_PICK);
-        } else {
-            // Permission already granted, start the image picker
+        if (checkImagePermission() && checkSingleLocationPermission()) {
             startImagePickerIntent();
+        } else {
+            // Request the necessary permissions
+            String[] permissions = new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            };
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_IMAGE_PICK_SEND);
         }
     }
-    private void selectVideoFromGallery() {
+    private void selectVideoPermissionCheck() {
         // Check if the necessary permissions are granted
-        if (checkVideoPermission()) {
+        if (checkVideoPermission() && checkSingleLocationPermission()) {
             // Permissions are already granted, open the video selection intent
             startVideoPickerIntent();
         } else {
@@ -191,21 +168,23 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             String[] permissions = new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
             };
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_SELECT_VIDEO);
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_VIDEO_PICK_SEND);
         }
     }
     // media: invoke picker
     private void startImagePickerIntent() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+        startActivityForResult(intent, REQUEST_IMAGE_PICK_SEND);
     }
     private void startVideoPickerIntent() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("video/*");
-        startActivityForResult(intent, REQUEST_SELECT_VIDEO);
+        startActivityForResult(intent, REQUEST_VIDEO_PICK_SEND);
     }
     // media: permission
     private boolean checkVideoPermission() {
@@ -218,38 +197,12 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                 writeStoragePermission == PackageManager.PERMISSION_GRANTED &&
                 cameraPermission == PackageManager.PERMISSION_GRANTED;
     }
+    private boolean checkImagePermission() {
+        // Check if the required permissions are granted
+        int readStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
-    // media: picker result(uri) handler
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
-            Uri selectedImageUri = data.getData();
-            // Call getLocation before uploading the image
-            singleLocation.getLocation(new SingleLocation.LocationCallback() {
-                @Override
-                public void onLocationReceived(double latitude, double longitude) {
-                    // Location received, now you can upload the image
-                    String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
-                    ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
-                    uploadImageToServer(selectedImageUri, latitude, longitude);
-                }
-            });
-        }else if (requestCode == REQUEST_SELECT_VIDEO && resultCode == RESULT_OK && data != null) {
-            Uri selectedVideoUri = data.getData();
-            // Call getLocation before uploading the video
-            singleLocation.getLocation(new SingleLocation.LocationCallback() {
-                @Override
-                public void onLocationReceived(double latitude, double longitude) {
-                    // Location received, now you can upload the video
-                    String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
-                    ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
-                    uploadVideoToServer(selectedVideoUri, latitude, longitude);
-                }
-            });
-        }
+        return readStoragePermission == PackageManager.PERMISSION_GRANTED;
     }
-
     //media: upload
     private void uploadImageToServer(Uri imageUri, double latitude, double longitude) {
         try {
@@ -354,4 +307,37 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         }
 
     }
+
+    // media: picker result(uri) handler. Send to server
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_PICK_SEND && resultCode == RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
+            // Call getLocation and then upload the image
+            singleLocation.getLocation(new SingleLocation.LocationCallback() {
+                @Override
+                public void onLocationReceived(double latitude, double longitude) {
+                    // Location received, now you can upload the image
+                    String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
+                    ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
+                    uploadImageToServer(selectedImageUri, latitude, longitude);
+                }
+            });
+        }else if (requestCode == REQUEST_VIDEO_PICK_SEND && resultCode == RESULT_OK && data != null) {
+            Uri selectedVideoUri = data.getData();
+            // Call getLocation and then upload the video
+            singleLocation.getLocation(new SingleLocation.LocationCallback() {
+                @Override
+                public void onLocationReceived(double latitude, double longitude) {
+                    // Location received, now you can upload the video
+                    String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
+                    ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
+                    uploadVideoToServer(selectedVideoUri, latitude, longitude);
+                }
+            });
+        }
+    }
+
+
 }
