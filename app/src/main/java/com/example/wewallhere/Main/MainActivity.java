@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        buttonToExploreList = findViewById(R.id.go_to_view_media_list);
         buttonToExploreList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

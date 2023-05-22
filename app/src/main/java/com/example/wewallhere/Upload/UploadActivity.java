@@ -131,9 +131,9 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             }
             if (allPermissionsGranted) {
                 if (requestCode == REQUEST_IMAGE_PICK_SEND){
-                    startVideoPickerIntent();
-                }else if (requestCode == REQUEST_VIDEO_PICK_SEND){
                     startImagePickerIntent();
+                }else if (requestCode == REQUEST_VIDEO_PICK_SEND){
+                    startVideoPickerIntent();
                 }
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
