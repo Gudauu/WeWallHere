@@ -6,10 +6,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import com.example.wewallhere.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import Helper.ToastHelper;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class ExploreListActivity extends AppCompatActivity {
@@ -37,31 +46,38 @@ public class ExploreListActivity extends AppCompatActivity {
     // Create a list of media entries (dummy data for demonstration)
     private List<MediaEntry> createMediaList() {
         List<MediaEntry> mediaList = new ArrayList<>();
+        // Create a Retrofit instance
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://54.252.196.140:3001/") // Replace with your server URL
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        // Add media entries to the list
-        // You can populate the list with your actual data
-        // Here, we are adding dummy data for demonstration
+        // Create a service interface for your API endpoints
+        MediaService mediaService = retrofit.create(MediaService.class);
 
-        // Media 1
-        MediaEntry media1 = new MediaEntry();
-//        media1.setMediaUri(Uri.parse("path_to_media_file_1"));
-//        media1.setProfilePicResId(R.drawable.profile_pic_1);
-        media1.setTitle("Media 1");
-//        media1.setUploaderName("Uploader 1");
-//        media1.setUploadDate("May 20, 2023");
-        mediaList.add(media1);
-//
-//        // Media 2
-        MediaEntry media2 = new MediaEntry();
-//        media2.setMediaUri(Uri.parse("path_to_media_file_2"));
-//        media2.setProfilePicResId(R.drawable.profile_pic_2);
-        media2.setTitle("Media 2");
-//        media2.setUploaderName("Uploader 2");
-//        media2.setUploadDate("May 21, 2023");
-        mediaList.add(media2);
+        // Make an API call to retrieve media files
+        Call<List<MediaEntry>> call = mediaService.getMediaList("image");  // , "image_1684667427711_388"
+        call.enqueue(new Callback<List<MediaEntry>>() {
+            @Override
+            public void onResponse(Call<List<MediaEntry>> call, Response<List<MediaEntry>> response) {
+                if (response.isSuccessful()) {
+                    List<MediaEntry> mediaEntries = response.body();
+                    // Handle the retrieved media entries
+                    mediaList.addAll(mediaEntries);
+                } else {
+                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                }
+            }
 
-        // ...
+            @Override
+            public void onFailure(Call<List<MediaEntry>> call, Throwable t) {
+                // Handle network or other errors
+                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+            }
+        });
 
         return mediaList;
     }
+
+
 }
