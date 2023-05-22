@@ -43,22 +43,22 @@ public class ExploreListActivity extends AppCompatActivity {
         // Here, we are adding dummy data for demonstration
 
         // Media 1
-//        MediaEntry media1 = new MediaEntry();
+        MediaEntry media1 = new MediaEntry();
 //        media1.setMediaUri(Uri.parse("path_to_media_file_1"));
 //        media1.setProfilePicResId(R.drawable.profile_pic_1);
-//        media1.setTitle("Media 1");
+        media1.setTitle("Media 1");
 //        media1.setUploaderName("Uploader 1");
 //        media1.setUploadDate("May 20, 2023");
-//        mediaList.add(media1);
+        mediaList.add(media1);
 //
 //        // Media 2
-//        MediaEntry media2 = new MediaEntry();
+        MediaEntry media2 = new MediaEntry();
 //        media2.setMediaUri(Uri.parse("path_to_media_file_2"));
 //        media2.setProfilePicResId(R.drawable.profile_pic_2);
-//        media2.setTitle("Media 2");
+        media2.setTitle("Media 2");
 //        media2.setUploaderName("Uploader 2");
 //        media2.setUploadDate("May 21, 2023");
-//        mediaList.add(media2);
+        mediaList.add(media2);
 
         // ...
 

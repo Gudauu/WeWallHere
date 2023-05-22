@@ -19,9 +19,6 @@
         android:theme="@style/Theme.WeWallHere"
         android:usesCleartextTraffic="true" >
         <activity
-            android:name=".ExploreByList.ExploreListActivity"
-            android:exported="false" />
-        <activity
             android:name=".Main.MainActivity"
             android:exported="true" >
             <intent-filter>
@@ -31,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Upload.UploadActivity" />
+        <activity android:name=".ExploreByList.ExploreListActivity"/>
     </application>
 
 </manifest>
