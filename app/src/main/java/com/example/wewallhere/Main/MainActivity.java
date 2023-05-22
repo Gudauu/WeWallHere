@@ -11,9 +11,11 @@ import android.widget.Button;
 
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 
 public class MainActivity extends AppCompatActivity {
     private Button buttonToUploadSection;
+    private Button buttonToExploreList;
     private final String [] all_permissions = {
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
@@ -31,6 +33,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        buttonToExploreList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, ExploreListActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         ActivityCompat.requestPermissions(this, all_permissions, 200);
 
