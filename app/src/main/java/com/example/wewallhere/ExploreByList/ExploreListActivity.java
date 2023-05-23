@@ -24,8 +24,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ExploreListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MediaAdapter mediaAdapter;
-    private List<MediaEntry> mediaList = new ArrayList<>();;
-    private List<MongoMediaEntry> metadataList = new ArrayList<>();;
+    private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
+    private String url_download = "http://54.252.196.140:3002/download/";
+    private String url_mongometa = "http://54.252.196.140:3001/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,21 +38,21 @@ public class ExploreListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Create and set the adapter for empty mediaList
-        mediaAdapter = new MediaAdapter(mediaList);
+        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
         recyclerView.setAdapter(mediaAdapter);
 
-        fetchMetaData();
+        updateMedia();
     }
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
-        mediaAdapter = new MediaAdapter(mediaList);
+        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
         recyclerView.setAdapter(mediaAdapter);
     }
 
-    private void fetchMetaData() {
+    private void updateMedia() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://54.252.196.140:3001/") // Replace with your server URL
+                .baseUrl(url_mongometa) 
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -67,7 +68,9 @@ public class ExploreListActivity extends AppCompatActivity {
                     List<MongoMediaEntry> mediaEntries = response.body();
 
                     // Handle the retrieved media entries
-                    metadataList.addAll(mediaEntries);
+                    mongoMetaList.addAll(mediaEntries);
+                    updateRecyclerView();
+
                 } else {
                     ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
                 }
