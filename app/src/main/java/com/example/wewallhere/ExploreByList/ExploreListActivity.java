@@ -24,7 +24,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ExploreListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MediaAdapter mediaAdapter;
-    private List<MediaEntry> mediaList;
+    private List<MediaEntry> mediaList = new ArrayList<>();;
+    private List<MongoMediaEntry> metadataList = new ArrayList<>();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,29 +36,20 @@ public class ExploreListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // update mediaList
-        loadMediaList("image");
+        // Create and set the adapter for empty mediaList
+        mediaAdapter = new MediaAdapter(mediaList);
+        recyclerView.setAdapter(mediaAdapter);
 
-        // Create and set the adapter
+        fetchMetaData();
+    }
+
+    private void updateRecyclerView() {
+        // Create a new adapter with the updated media list
         mediaAdapter = new MediaAdapter(mediaList);
         recyclerView.setAdapter(mediaAdapter);
     }
-    private void loadMediaList(String type) {
-        createMediaList(new MediaListCallback() {
-            @Override
-            public void onMediaListLoaded(List<MediaEntry> mediaEntries) {
-                mediaList = mediaEntries;
-            }
-            @Override
-            public void onMediaListFailed(String errorMessage) {
-                ToastHelper.showLongToast(getApplicationContext(), "Fetching failed: " + errorMessage, Toast.LENGTH_LONG);
-            }
-        }, type);
-    }
 
-
-    // Create a list of media entries
-    private void createMediaList(MediaListCallback callback, String type) {
+    private void fetchMetaData() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://54.252.196.140:3001/") // Replace with your server URL
                 .addConverterFactory(GsonConverterFactory.create())
@@ -67,22 +59,24 @@ public class ExploreListActivity extends AppCompatActivity {
         MediaService mediaService = retrofit.create(MediaService.class);
 
         // Make an API call to retrieve media files
-        Call<List<MediaEntry>> call = mediaService.getMediaList(type);  // , "image_1684667427711_388"
-        call.enqueue(new Callback<List<MediaEntry>>() {
+        Call<List<MongoMediaEntry>> call = mediaService.getMetaDataList("image");  // , "image_1684667427711_388"
+        call.enqueue(new Callback<List<MongoMediaEntry>>() {
             @Override
-            public void onResponse(Call<List<MediaEntry>> call, Response<List<MediaEntry>> response) {
+            public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
                 if (response.isSuccessful()) {
-                    List<MediaEntry> mediaEntries = response.body();
+                    List<MongoMediaEntry> mediaEntries = response.body();
+
                     // Handle the retrieved media entries
-                    callback.onMediaListLoaded(mediaEntries);
+                    metadataList.addAll(mediaEntries);
                 } else {
-                    callback.onMediaListFailed(response.message());
+                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
                 }
             }
 
             @Override
-            public void onFailure(Call<List<MediaEntry>> call, Throwable t) {
-                callback.onMediaListFailed(t.getMessage());
+            public void onFailure(Call<List<MongoMediaEntry>> call, Throwable t) {
+                // Handle network or other errors
+                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
             }
         });
 
