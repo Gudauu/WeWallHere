@@ -18,7 +18,25 @@ public class MongoMediaEntry {
         this.date = date;
     }
 
+    public String getFilename() {
+        return filename;
+    }
 
+    public String getPath() {
+        return path;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public String getDate() {
+        return date;
+    }
 }
 
 

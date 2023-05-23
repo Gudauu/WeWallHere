@@ -62,6 +62,9 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
     private static final int REQUEST_IMAGE_PICK_SEND = 1301;
     private static final int REQUEST_VIDEO_PICK_SEND = 1302;
 
+    private String url_upload = "http://54.252.196.140:3000/";
+
+
     private SingleLocation singleLocation;
 
 
@@ -208,7 +211,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         try {
             // Create a Retrofit instance
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://54.252.196.140:3000") // Replace with your server's IP address
+                    .baseUrl(url_upload) // Replace with your server's IP address
                     .build();
 
             // Create the request body for image, latitude and longitude
@@ -262,7 +265,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         try{
             // Create the Retrofit instance
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://54.252.196.140:3000")
+                    .baseUrl(url_upload)
                     .build();
 
 
