@@ -11,6 +11,10 @@ public interface MediaService {
     Call<List<MediaEntry>> getMediaList(
             @Path("type") String type
     );
+    @GET("media/{type}")
+    Call<List<MongoMediaEntry>> getMetaDataList(
+            @Path("type") String type
+    );
 }
 
 //public interface MediaService {
