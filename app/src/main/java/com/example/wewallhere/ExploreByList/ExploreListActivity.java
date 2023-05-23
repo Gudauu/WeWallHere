@@ -35,18 +35,29 @@ public class ExploreListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Create a list of media entries
-        mediaList = createMediaList();
+        // update mediaList
+        loadMediaList("image");
 
         // Create and set the adapter
         mediaAdapter = new MediaAdapter(mediaList);
         recyclerView.setAdapter(mediaAdapter);
     }
+    private void loadMediaList(String type) {
+        createMediaList(new MediaListCallback() {
+            @Override
+            public void onMediaListLoaded(List<MediaEntry> mediaEntries) {
+                mediaList = mediaEntries;
+            }
+            @Override
+            public void onMediaListFailed(String errorMessage) {
+                ToastHelper.showLongToast(getApplicationContext(), "Fetching failed: " + errorMessage, Toast.LENGTH_LONG);
+            }
+        }, type);
+    }
 
-    // Create a list of media entries (dummy data for demonstration)
-    private List<MediaEntry> createMediaList() {
-        List<MediaEntry> mediaList = new ArrayList<>();
-        // Create a Retrofit instance
+
+    // Create a list of media entries
+    private void createMediaList(MediaListCallback callback, String type) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://54.252.196.140:3001/") // Replace with your server URL
                 .addConverterFactory(GsonConverterFactory.create())
@@ -56,27 +67,25 @@ public class ExploreListActivity extends AppCompatActivity {
         MediaService mediaService = retrofit.create(MediaService.class);
 
         // Make an API call to retrieve media files
-        Call<List<MediaEntry>> call = mediaService.getMediaList("image");  // , "image_1684667427711_388"
+        Call<List<MediaEntry>> call = mediaService.getMediaList(type);  // , "image_1684667427711_388"
         call.enqueue(new Callback<List<MediaEntry>>() {
             @Override
             public void onResponse(Call<List<MediaEntry>> call, Response<List<MediaEntry>> response) {
                 if (response.isSuccessful()) {
                     List<MediaEntry> mediaEntries = response.body();
                     // Handle the retrieved media entries
-                    mediaList.addAll(mediaEntries);
+                    callback.onMediaListLoaded(mediaEntries);
                 } else {
-                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                    callback.onMediaListFailed(response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<List<MediaEntry>> call, Throwable t) {
-                // Handle network or other errors
-                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                callback.onMediaListFailed(t.getMessage());
             }
         });
 
-        return mediaList;
     }
 
 
