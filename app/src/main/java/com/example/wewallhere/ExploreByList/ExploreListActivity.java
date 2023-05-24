@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -25,20 +24,24 @@ public class ExploreListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MediaAdapter mediaAdapter;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
-    private String url_download = "http://54.252.196.140:3002/download/";
-    private String url_mongometa = "http://54.252.196.140:3000/";
+    private String url_media_service = "http://54.252.196.140:3000/";
+    private String url_server = "http://54.252.196.140";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explore_list);
 
+        // remove the top left app title
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+
         // Initialize the RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Create and set the adapter for empty mediaList
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
+        mediaAdapter = new MediaAdapter(mongoMetaList, url_server);
         recyclerView.setAdapter(mediaAdapter);
 
         updateMedia();
@@ -46,21 +49,21 @@ public class ExploreListActivity extends AppCompatActivity {
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
+        mediaAdapter = new MediaAdapter(mongoMetaList, url_server);
         recyclerView.setAdapter(mediaAdapter);
     }
 
     private void updateMedia() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url_mongometa) 
+                .baseUrl(url_media_service)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         // Create a service interface for your API endpoints
-        MediaService mediaService = retrofit.create(MediaService.class);
+        MongoMetaService mongoMetaService = retrofit.create(MongoMetaService.class);
 
         // Make an API call to retrieve media files
-        Call<List<MongoMediaEntry>> call = mediaService.getMetaDataList("image");  // , "image_1684667427711_388"
+        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList("video");  // , "image_1684667427711_388"
         call.enqueue(new Callback<List<MongoMediaEntry>>() {
             @Override
             public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {

@@ -1,18 +1,13 @@
 package com.example.wewallhere.Upload;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,29 +16,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.gmaps.SingleLocation;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
@@ -224,10 +201,10 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             RequestBody longitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(longitude));
 
             // Create an instance of the API service interface
-            ApiService apiService = retrofit.create(ApiService.class);
+            UploadService uploadService = retrofit.create(UploadService.class);
 
             // Send the image file to the server
-            Call<ResponseBody> call = apiService.uploadImage(imagePart, latitudeBody, longitudeBody);
+            Call<ResponseBody> call = uploadService.uploadImage(imagePart, latitudeBody, longitudeBody);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -280,10 +257,10 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             RequestBody longitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(longitude));
 
             // Create the API service interface
-            ApiService apiService = retrofit.create(ApiService.class);
+            UploadService uploadService = retrofit.create(UploadService.class);
 
             // Create the API call to upload the video
-            Call<ResponseBody> call = apiService.uploadVideo(videoPart, latitudeBody, longitudeBody);
+            Call<ResponseBody> call = uploadService.uploadVideo(videoPart, latitudeBody, longitudeBody);
 
             // Enqueue the API call
             call.enqueue(new Callback<ResponseBody>() {

@@ -17,13 +17,14 @@
         <ImageView
             android:id="@+id/imageViewMedia"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="220dp"
             android:scaleType="centerCrop" />
+<!--            android:scaleType="fitCenter" />-->
 
         <VideoView
             android:id="@+id/videoViewMedia"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="220dp"
             android:visibility="gone" />
 
     </FrameLayout>
