@@ -26,7 +26,7 @@ public class ExploreListActivity extends AppCompatActivity {
     private MediaAdapter mediaAdapter;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
     private String url_download = "http://54.252.196.140:3002/download/";
-    private String url_mongometa = "http://54.252.196.140:3001/";
+    private String url_mongometa = "http://54.252.196.140:3000/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
