@@ -8,10 +8,6 @@ import retrofit2.http.Path;
 
 public interface MediaService {
     @GET("media/{type}")
-    Call<List<MediaEntry>> getMediaList(
-            @Path("type") String type
-    );
-    @GET("media/{type}")
     Call<List<MongoMediaEntry>> getMetaDataList(
             @Path("type") String type
     );
