@@ -34,19 +34,26 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
         MongoMediaEntry mongoEntry = mongometaEntries.get(position);
-        String mediaUrl = serverIP + mongoEntry.getFilename();
+
 
         if (isVideoFilename(mongoEntry.getFilename())) {
+            String videourl = serverIP + ":3000/download/video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
-            holder.videoViewMedia.setVideoURI(Uri.parse(mediaUrl));
+//            holder.videoViewMedia.setVideoPath(mediaUrl);
+            //            holder.videoViewMedia.setVideoURI(Uri.parse("http://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4"));
+//            holder.videoViewMedia.setVideoURI(Uri.parse(videourl));
+
+            holder.videoViewMedia.setVideoURI(Uri.parse("http://54.252.196.140/media/video_1684920829722_954.mp4"));
             holder.videoViewMedia.start();
         } else {
+            String imagedownloadUrl = serverIP + ":3000/download/image/" + mongoEntry.getFilename();
+
             holder.imageViewMedia.setVisibility(View.VISIBLE);
             holder.videoViewMedia.setVisibility(View.GONE);
 
             Glide.with(holder.itemView.getContext())
-                    .load(mediaUrl)
+                    .load(imagedownloadUrl)
                     .into(holder.imageViewMedia);
         }
 

@@ -8,7 +8,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 
-public interface ApiService {
+public interface UploadService {
     @Multipart
     @POST("/upload") // Replace with your server's upload endpoint
     Call<ResponseBody> uploadImage(
