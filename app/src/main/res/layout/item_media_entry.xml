@@ -12,7 +12,8 @@
     <FrameLayout
         android:id="@+id/frameLayoutMedia"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/imageViewMedia"
@@ -25,7 +26,6 @@
             android:id="@+id/videoViewMedia"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_centerHorizontal="true"
             android:visibility="gone" />
 
     </FrameLayout>
