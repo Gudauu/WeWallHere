@@ -36,7 +36,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
         MongoMediaEntry mongoEntry = mongometaEntries.get(position);
 
-
         if (isVideoFilename(mongoEntry.getFilename())) {
             String videourl = serverIP + "video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);

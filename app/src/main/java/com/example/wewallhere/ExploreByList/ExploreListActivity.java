@@ -56,7 +56,7 @@ public class ExploreListActivity extends AppCompatActivity {
     }
     private void initTopBar(){
         // remove the top left app title
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+//        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         // Initialize toolbar view
         topbar = findViewById(R.id.toolbar);
         // Set the toolbar as the action bar
@@ -120,6 +120,7 @@ public class ExploreListActivity extends AppCompatActivity {
                     List<MongoMediaEntry> mediaEntries = response.body();
 
                     // Handle the retrieved media entries
+                    mongoMetaList.clear();
                     mongoMetaList.addAll(mediaEntries);
                     updateRecyclerView();
 
