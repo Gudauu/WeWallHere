@@ -1,5 +1,6 @@
 package com.example.wewallhere.ExploreByList;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,17 +38,21 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 
 
         if (isVideoFilename(mongoEntry.getFilename())) {
-            String videourl = serverIP + ":3000/download/video/" + mongoEntry.getFilename();
+            String videourl = serverIP + "video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
-//            holder.videoViewMedia.setVideoPath(mediaUrl);
-            //            holder.videoViewMedia.setVideoURI(Uri.parse("http://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4"));
-//            holder.videoViewMedia.setVideoURI(Uri.parse(videourl));
+            //            holder.videoViewMedia.setVideoPath(mediaUrl);
+//            holder.videoViewMedia.setVideoURI(Uri.parse("http://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4"));
+            //            holder.videoViewMedia.setVideoURI(Uri.parse("http://54.252.196.140/media/video_1684920829722_954.mp4"));
 
-            holder.videoViewMedia.setVideoURI(Uri.parse("http://54.252.196.140/media/video_1684920829722_954.mp4"));
-            holder.videoViewMedia.start();
+            holder.videoViewMedia.setVideoURI(Uri.parse(videourl));
+            holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                public void onPrepared(MediaPlayer mp) {
+                    holder.videoViewMedia.start();
+                }
+            });
         } else {
-            String imagedownloadUrl = serverIP + ":3000/download/image/" + mongoEntry.getFilename();
+            String imagedownloadUrl = serverIP + "image/" + mongoEntry.getFilename();
 
             holder.imageViewMedia.setVisibility(View.VISIBLE);
             holder.videoViewMedia.setVisibility(View.GONE);

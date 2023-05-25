@@ -24,7 +24,8 @@
         <VideoView
             android:id="@+id/videoViewMedia"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="300dp"
+            android:layout_centerHorizontal="true"
             android:visibility="gone" />
 
     </FrameLayout>
