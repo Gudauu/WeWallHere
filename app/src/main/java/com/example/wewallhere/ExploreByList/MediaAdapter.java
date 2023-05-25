@@ -41,9 +41,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             String videourl = serverIP + "video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
-            //            holder.videoViewMedia.setVideoPath(mediaUrl);
 //            holder.videoViewMedia.setVideoURI(Uri.parse("http://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4"));
-            //            holder.videoViewMedia.setVideoURI(Uri.parse("http://54.252.196.140/media/video_1684920829722_954.mp4"));
 
             holder.videoViewMedia.setVideoURI(Uri.parse(videourl));
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
