@@ -39,7 +39,6 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
     private static final int REQUEST_IMAGE_PICK_SEND = 1301;
     private static final int REQUEST_VIDEO_PICK_SEND = 1302;
 
-    private String url_upload = "http://54.252.196.140:3000/";
 
 
     private SingleLocation singleLocation;
@@ -184,109 +183,6 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         return readStoragePermission == PackageManager.PERMISSION_GRANTED;
     }
     //media: upload
-    private void uploadImageToServer(Uri imageUri, double latitude, double longitude) {
-        try {
-            // Create a Retrofit instance
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(url_upload) // Replace with your server's IP address
-                    .build();
-
-            // Create the request body for image, latitude and longitude
-            InputStream inputStream = getContentResolver().openInputStream(imageUri);
-            RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), getBytesFromInputStream(inputStream));
-            String fileName = "image_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
-            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", fileName, requestBody);
-
-            RequestBody latitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(latitude));
-            RequestBody longitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(longitude));
-
-            // Create an instance of the API service interface
-            UploadService uploadService = retrofit.create(UploadService.class);
-
-            // Send the image file to the server
-            Call<ResponseBody> call = uploadService.uploadImage(imagePart, latitudeBody, longitudeBody);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        // Image uploaded successfully
-                        Toast.makeText(UploadActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Handle error response
-                        Toast.makeText(UploadActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                        ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    // Handle network failure
-                    ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
-                }
-            });
-        } catch (Exception e) {
-            ToastHelper.showLongToast(UploadActivity.this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_LONG);
-        }
-    }
-    // helper function in video upload
-    private byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        byte[] buffer = new byte[4 * 1024]; // Adjust the buffer size as needed
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, bytesRead);
-        }
-        return byteBuffer.toByteArray();
-    }
-    private void uploadVideoToServer(Uri videoUri,  double latitude, double longitude){
-        try{
-            // Create the Retrofit instance
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(url_upload)
-                    .build();
-
-
-
-            // Create the request body for video, latitude and longitude
-            InputStream inputStream = getContentResolver().openInputStream(videoUri);
-            RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), getBytesFromInputStream(inputStream));
-            String fileName = "video_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
-            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("file", fileName, requestBody);
-
-            RequestBody latitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(latitude));
-            RequestBody longitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(longitude));
-
-            // Create the API service interface
-            UploadService uploadService = retrofit.create(UploadService.class);
-
-            // Create the API call to upload the video
-            Call<ResponseBody> call = uploadService.uploadVideo(videoPart, latitudeBody, longitudeBody);
-
-            // Enqueue the API call
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        // Video uploaded successfully
-                        Toast.makeText(UploadActivity.this, "Video uploaded successfully", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Video upload failed
-                        Toast.makeText(UploadActivity.this, "video upload failed:", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    // Handle the upload failure
-                    ToastHelper.showLongToast(UploadActivity.this, "Video upload failed: " + t.getMessage(), Toast.LENGTH_LONG);
-                }
-            });
-        } catch (Exception e){
-            ToastHelper.showLongToast(UploadActivity.this, "Video upload failed:" + e, Toast.LENGTH_LONG);
-
-        }
-
-    }
 
     // media: picker result(uri) handler. Send to server
     @Override
@@ -301,7 +197,13 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                     // Location received, now you can upload the image
                     String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
                     ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
-                    uploadImageToServer(selectedImageUri, latitude, longitude);
+                    Intent intent = new Intent(UploadActivity.this, ComposeActivity.class);
+                    intent.putExtra("isVideo", false); // Replace true with the actual boolean value
+                    intent.putExtra("Uri", selectedImageUri);
+                    intent.putExtra("latitude", latitude);
+                    intent.putExtra("longitude", longitude);
+                    startActivity(intent);
+//                    uploadImageToServer(selectedImageUri, latitude, longitude);
                 }
             });
         }else if (requestCode == REQUEST_VIDEO_PICK_SEND && resultCode == RESULT_OK && data != null) {
@@ -313,7 +215,13 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                     // Location received, now you can upload the video
                     String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
                     ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
-                    uploadVideoToServer(selectedVideoUri, latitude, longitude);
+                    Intent intent = new Intent(UploadActivity.this, ComposeActivity.class);
+                    intent.putExtra("isVideo", true); // Replace true with the actual boolean value
+                    intent.putExtra("Uri", selectedVideoUri);
+                    intent.putExtra("latitude", latitude);
+                    intent.putExtra("longitude", longitude);
+                    startActivity(intent);
+//                    uploadVideoToServer(selectedVideoUri, latitude, longitude);
                 }
             });
         }
