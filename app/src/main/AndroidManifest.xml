@@ -30,6 +30,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Upload.UploadActivity" />
+        <activity android:name=".Upload.ComposeActivity" />
         <activity android:name=".ExploreByList.ExploreListActivity"/>
         <activity
             android:name=".gmaps.ExploreMapActivity" >

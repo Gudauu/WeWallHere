@@ -194,38 +194,43 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             singleLocation.getLocation(new SingleLocation.LocationCallback() {
                 @Override
                 public void onLocationReceived(double latitude, double longitude) {
-                    // Location received, now you can upload the image
-                    String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
-                    ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
-                    Intent intent = new Intent(UploadActivity.this, ComposeActivity.class);
-                    intent.putExtra("isVideo", false); // Replace true with the actual boolean value
-                    intent.putExtra("Uri", selectedImageUri);
-                    intent.putExtra("latitude", latitude);
-                    intent.putExtra("longitude", longitude);
-                    startActivity(intent);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(UploadActivity.this, ComposeActivity.class);
+                            intent.putExtra("isVideo", false); // Replace true with the actual boolean value
+                            intent.putExtra("Uri", selectedImageUri);
+                            intent.putExtra("latitude", latitude);
+                            intent.putExtra("longitude", longitude);
+                            startActivity(intent);
+                        }
+                    });
 //                    uploadImageToServer(selectedImageUri, latitude, longitude);
                 }
             });
-        }else if (requestCode == REQUEST_VIDEO_PICK_SEND && resultCode == RESULT_OK && data != null) {
+        } else if (requestCode == REQUEST_VIDEO_PICK_SEND && resultCode == RESULT_OK && data != null) {
             Uri selectedVideoUri = data.getData();
             // Call getLocation and then upload the video
             singleLocation.getLocation(new SingleLocation.LocationCallback() {
                 @Override
                 public void onLocationReceived(double latitude, double longitude) {
-                    // Location received, now you can upload the video
-                    String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
-                    ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
-                    Intent intent = new Intent(UploadActivity.this, ComposeActivity.class);
-                    intent.putExtra("isVideo", true); // Replace true with the actual boolean value
-                    intent.putExtra("Uri", selectedVideoUri);
-                    intent.putExtra("latitude", latitude);
-                    intent.putExtra("longitude", longitude);
-                    startActivity(intent);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(UploadActivity.this, ComposeActivity.class);
+                            intent.putExtra("isVideo", true); // Replace true with the actual boolean value
+                            intent.putExtra("Uri", selectedVideoUri);
+                            intent.putExtra("latitude", latitude);
+                            intent.putExtra("longitude", longitude);
+                            startActivity(intent);
+                        }
+                    });
 //                    uploadVideoToServer(selectedVideoUri, latitude, longitude);
                 }
             });
         }
     }
+
 
 
 }
