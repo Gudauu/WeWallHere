@@ -3,6 +3,7 @@ package com.example.wewallhere.gmaps;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMetaService;
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 
 
@@ -20,11 +22,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -64,8 +71,6 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         mapView.getMapAsync(this);
     }
     private void initTopBar(){
-        // remove the top left app title
-//        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         // Initialize toolbar view
         topbar = findViewById(R.id.toolbar);
         // Set the toolbar as the action bar
@@ -138,17 +143,48 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         // Enable the user's current location on the map
         if (!checkSingleLocationPermission()) {
             ToastHelper.showLongToast(getApplicationContext(), "No location permission.", Toast.LENGTH_SHORT);
+            Intent intent = new Intent();
+            intent.setClass(ExploreMapActivity.this, MainActivity.class);
+            startActivity(intent);
             return;
         }
+        // Enable the "My Location" button
         googleMap.setMyLocationEnabled(true);
+
+        // Set a click listener on the "My Location" button to center the map
+        googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                // Center the map around the user's current location
+                if (ContextCompat.checkSelfPermission(ExploreMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    // Get the user's current location
+                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(ExploreMapActivity.this);
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    if (location != null) {
+                                        // Center the map on the user's location
+                                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f);
+                                        googleMap.animateCamera(cameraUpdate);
+                                    }
+                                }
+                            });
+                }
+                return true;
+            }
+        });
+
         // Add markers for media files on the map
         updateMedia();
     }
 
 
-    private void addMediaMarkers() {
+    private void updateMediaMarkers() {
         // Retrieve the list of media files with their latitude and longitude
         // Add markers for each media file on the map
+        googleMap.clear();
         for (MongoMediaEntry media : mongoMetaList) {
             LatLng position = new LatLng(media.getLatitude(), media.getLongitude());
             MarkerOptions markerOptions = new MarkerOptions()
@@ -178,7 +214,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                     // Handle the retrieved media entries
                     mongoMetaList.clear();
                     mongoMetaList.addAll(mediaEntries);
-                    addMediaMarkers();
+                    updateMediaMarkers();
 
                 } else {
                     ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
