@@ -2,6 +2,7 @@ package com.example.wewallhere.ExploreByList;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 import com.example.wewallhere.R;
@@ -16,6 +17,8 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
     public TextView textViewTitle;
     public TextView textViewUploader;
     public TextView textViewDate;
+    public MediaController mediaController;
+
 
     public MediaViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -25,6 +28,8 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
         textViewUploader = itemView.findViewById(R.id.textViewUploader);
         textViewDate = itemView.findViewById(R.id.textViewDate);
         videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
+
+
     }
 }
 
