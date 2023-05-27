@@ -74,6 +74,8 @@ public class ComposeActivity extends AppCompatActivity {
                     ToastHelper.showLongToast(getApplicationContext(), "Content cannot be empty.", Toast.LENGTH_SHORT);
                     return;
                 }
+                String message = "Latitude: " + latitude + "\nLongitude: " + longitude;
+                ToastHelper.showLongToast(getApplicationContext(), message, Toast.LENGTH_SHORT);
                 if(isVideo){
                     uploadVideoToServer(fileUri, latitude, longitude, title, content);
                 }else{
