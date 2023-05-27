@@ -1,15 +1,19 @@
 package com.example.wewallhere.Main;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.example.wewallhere.R;
@@ -20,8 +24,12 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonToUploadSection;
     private Button buttonToExploreList;
     private VideoView tempVideo;
+    private int REQUEST_ALL = 200;
+    private int REQUEST_EXPLORE_ACTIVITY = 1022;
     private final String [] all_permissions = {
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +49,54 @@ public class MainActivity extends AppCompatActivity {
         buttonToExploreList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, ExploreListActivity.class);
-                startActivity(intent);
+                if (checkSingleLocationPermission()) {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, ExploreListActivity.class);
+                    startActivity(intent);
+                } else {
+                    // Request the necessary permissions
+                    String[] permissions = new String[]{
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    };
+                    ActivityCompat.requestPermissions(MainActivity.this, permissions, REQUEST_EXPLORE_ACTIVITY);
+                }
+
             }
         });
 
 
-        ActivityCompat.requestPermissions(this, all_permissions, 200);
+        ActivityCompat.requestPermissions(this, all_permissions, REQUEST_ALL);
 
 
 
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_EXPLORE_ACTIVITY) {
+            // Check if all required permissions are granted, including media & location
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, ExploreListActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private boolean checkSingleLocationPermission(){
+        int fine_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarse_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        return fine_location == PackageManager.PERMISSION_GRANTED &&
+                coarse_location == PackageManager.PERMISSION_GRANTED;
     }
 }

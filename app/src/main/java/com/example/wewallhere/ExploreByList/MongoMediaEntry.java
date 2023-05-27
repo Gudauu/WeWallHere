@@ -8,14 +8,18 @@ public class MongoMediaEntry {
     private double latitude;
     private double longitude;
     private String timestamp;
+    private String title;
+    private String uploaderName;
 
 
-    public MongoMediaEntry(String filename, String path, double latitude, double longitude, String timestamp) {
+    public MongoMediaEntry(String filename, String path, double latitude, double longitude, String timestamp,String title, String uploaderName) {
         this.filename = filename;
         this.path = path;
         this.latitude = latitude;
         this.longitude = longitude;
         this.timestamp = timestamp;
+        this.title = title;
+        this.uploaderName = uploaderName;
     }
 
     public String getFilename() {
@@ -36,6 +40,14 @@ public class MongoMediaEntry {
 
     public String getTimestamp() {
         return timestamp;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getUploaderName() {
+        return uploaderName;
     }
 }
 
