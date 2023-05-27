@@ -1,16 +1,26 @@
 package com.example.wewallhere.ExploreByList;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.gmaps.ExploreMapActivity;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import Helper.ToastHelper;
 import retrofit2.Call;
@@ -23,18 +33,20 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ExploreListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MediaAdapter mediaAdapter;
+    private TabLayout tabLayout;
+    private Spinner dropdownMenu;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
+    private Toolbar topbar;
+    private String media_type = "image";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explore_list);
 
-        // remove the top left app title
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        initTopBar();
 
         // Initialize the RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
@@ -43,9 +55,78 @@ public class ExploreListActivity extends AppCompatActivity {
         // Create and set the adapter for empty mediaList
         mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
         recyclerView.setAdapter(mediaAdapter);
-
         updateMedia();
     }
+    private void initTopBar(){
+        // remove the top left app title
+//        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        // Initialize toolbar view
+        topbar = findViewById(R.id.toolbar);
+        // Set the toolbar as the action bar
+        setSupportActionBar(topbar);
+        tabLayout = findViewById(R.id.tabLayout);
+        // Set up tabs for ExploreListActivity
+        TabLayout.Tab listViewTab = tabLayout.newTab().setText("List View");
+        TabLayout.Tab mapViewTab = tabLayout.newTab().setText("Map View");
+
+        tabLayout.addTab(listViewTab);
+        tabLayout.addTab(mapViewTab);
+        listViewTab.select();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                if (position == 0) {
+                    // do nothing
+                } else if (position == 1) {
+
+                    // Handle the click on the "List View" tab
+                    Intent listIntent = new Intent(ExploreListActivity.this, ExploreMapActivity.class);
+                    startActivity(listIntent);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // Handle tab unselected event if needed
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // Handle tab reselected event if needed
+            }
+        });
+
+        // Set up dropdown menu options for image/video selection
+        dropdownMenu = findViewById(R.id.dropdownMenu);
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, new String[]{"image", "video"});
+        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dropdownMenu.setAdapter(dropdownAdapter);
+
+        // Set up dropdown menu item selection listener
+        dropdownMenu.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String new_media_type = parent.getItemAtPosition(position).toString();
+                if(!new_media_type.equals(media_type)){
+                    media_type = new_media_type;
+                    updateMedia();
+                }
+
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        dropdownMenu.setSelection(0); // Set the initial selection to the first item ("Images")
+
+    }
+
+
+
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
@@ -63,7 +144,7 @@ public class ExploreListActivity extends AppCompatActivity {
         MongoMetaService mongoMetaService = retrofit.create(MongoMetaService.class);
 
         // Make an API call to retrieve media files
-        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList("video");  // , "image_1684667427711_388"
+        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList(media_type);  // , "image_1684667427711_388"
         call.enqueue(new Callback<List<MongoMediaEntry>>() {
             @Override
             public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
@@ -71,6 +152,7 @@ public class ExploreListActivity extends AppCompatActivity {
                     List<MongoMediaEntry> mediaEntries = response.body();
 
                     // Handle the retrieved media entries
+                    mongoMetaList.clear();
                     mongoMetaList.addAll(mediaEntries);
                     updateRecyclerView();
 
@@ -86,6 +168,15 @@ public class ExploreListActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    // go to main page when scrolling back
+    @Override
+    public void onBackPressed() {
+        // Start the main activity or perform any other navigation action
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
+        startActivity(intent);
     }
 
 

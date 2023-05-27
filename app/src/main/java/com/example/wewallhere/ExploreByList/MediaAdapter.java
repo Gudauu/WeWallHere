@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -36,21 +37,42 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
         MongoMediaEntry mongoEntry = mongometaEntries.get(position);
 
-
         if (isVideoFilename(mongoEntry.getFilename())) {
             String videourl = serverIP + "video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
-            //            holder.videoViewMedia.setVideoPath(mediaUrl);
 //            holder.videoViewMedia.setVideoURI(Uri.parse("http://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4"));
-            //            holder.videoViewMedia.setVideoURI(Uri.parse("http://54.252.196.140/media/video_1684920829722_954.mp4"));
+
+            // control
+            MediaController mediaController = new MediaController(holder.itemView.getContext());
+            mediaController = new MediaController(holder.itemView.getContext());
+            mediaController.setAnchorView(holder.videoViewMedia);
+            holder.videoViewMedia.setMediaController(mediaController);
 
             holder.videoViewMedia.setVideoURI(Uri.parse(videourl));
+            MediaController finalMediaController = mediaController;
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
                 public void onPrepared(MediaPlayer mp) {
-                    holder.videoViewMedia.start();
+//                    holder.videoViewMedia.start();
+                    finalMediaController.show(); // Show the MediaController
                 }
             });
+            // Set an OnClickListener for the VideoView to start the video
+            holder.videoViewMedia.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!holder.videoViewMedia.isPlaying()) {
+                        holder.videoViewMedia.start();
+                    }
+                }
+            });
+
+//            holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                public void onPrepared(MediaPlayer mp) {
+//                    holder.videoViewMedia.start();
+//                }
+//            });
         } else {
             String imagedownloadUrl = serverIP + "image/" + mongoEntry.getFilename();
 
