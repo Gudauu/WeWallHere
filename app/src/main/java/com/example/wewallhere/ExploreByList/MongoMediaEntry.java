@@ -2,6 +2,10 @@ package com.example.wewallhere.ExploreByList;
 
 import com.example.wewallhere.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class MongoMediaEntry {
     private String filename;
     private String path;
@@ -45,6 +49,19 @@ public class MongoMediaEntry {
     }
 
     public String getTimestamp() {
+        // Define the input and output date formats
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
+
+        try {
+            // Parse the input timestamp string into a Date object
+            Date timestampDate = inputFormat.parse(timestamp);
+            // Format the Date object into the desired output format
+            String formattedTimestamp = outputFormat.format(timestampDate);
+            return formattedTimestamp;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return timestamp;
     }
 

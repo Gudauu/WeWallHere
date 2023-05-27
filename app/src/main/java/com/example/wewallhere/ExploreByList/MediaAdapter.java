@@ -85,9 +85,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
         }
 
 //        holder.imageViewProfilePic.setImageResource(mongoEntry.getProfilePicResId());
-//        holder.textViewTitle.setText(mongoEntry.getTitle());
-//        holder.textViewUploader.setText(mongoEntry.getUploaderName());
-//        holder.textViewDate.setText(mongoEntry.getUploadDate());
+        //        holder.textViewUploader.setText(mongoEntry.getUploaderName());
+
+        holder.textViewTitle.setText(mongoEntry.getTitle());
+        holder.textViewDate.setText(mongoEntry.getTimestamp());
     }
 
     @Override
