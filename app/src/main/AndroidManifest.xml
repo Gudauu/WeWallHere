@@ -18,17 +18,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WeWallHere"
         android:usesCleartextTraffic="true" >
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAZA36E9ijEV3gXOwctX56kCufbh-CsTKs" />
         <activity
             android:name=".Main.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".Upload.UploadActivity" />
         <activity android:name=".ExploreByList.ExploreListActivity"/>
+        <activity
+            android:name=".gmaps.ExploreMapActivity" >
+            <meta-data
+                android:name="com.google.android.gms.version"
+                android:value="@integer/google_play_services_version" />
+        </activity>
     </application>
 
 </manifest>

@@ -1,11 +1,8 @@
-package com.example.wewallhere.ExploreByList;
+package com.example.wewallhere.gmaps;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,13 +10,25 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
+import com.example.wewallhere.ExploreByList.MongoMetaService;
 import com.example.wewallhere.R;
-import com.example.wewallhere.gmaps.ExploreMapActivity;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
+import com.example.wewallhere.ExploreByList.MongoMediaEntry;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import Helper.ToastHelper;
 import retrofit2.Call;
@@ -28,33 +37,31 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-public class ExploreListActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
-    private MediaAdapter mediaAdapter;
+    private GoogleMap googleMap;
+    private MapView mapView;
+
     private TabLayout tabLayout;
+    private Toolbar topbar;
     private Spinner dropdownMenu;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
-    private String url_download = "http://54.252.196.140:3000/download/";
-    private Toolbar topbar;
+
     private String media_type = "image";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_explore_list);
-
+        setContentView(R.layout.activity_explore_maps);
         initTopBar();
 
-        // Initialize the RecyclerView
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Create and set the adapter for empty mediaList
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
-        recyclerView.setAdapter(mediaAdapter);
-        updateMedia();
+        // Obtain the MapView and initialize it
+        mapView = findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
     }
     private void initTopBar(){
         // remove the top left app title
@@ -70,19 +77,18 @@ public class ExploreListActivity extends AppCompatActivity {
 
         tabLayout.addTab(listViewTab);
         tabLayout.addTab(mapViewTab);
-        listViewTab.select();
+        mapViewTab.select();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
                 if (position == 0) {
-                    // do nothing
-                } else if (position == 1) {
-
                     // Handle the click on the "List View" tab
-                    Intent listIntent = new Intent(ExploreListActivity.this, ExploreMapActivity.class);
+                    Intent listIntent = new Intent(ExploreMapActivity.this, ExploreListActivity.class);
                     startActivity(listIntent);
+                } else if (position == 1) {
+                    // do nothing
                 }
             }
 
@@ -96,6 +102,7 @@ public class ExploreListActivity extends AppCompatActivity {
                 // Handle tab reselected event if needed
             }
         });
+
 
         // Set up dropdown menu options for image/video selection
         dropdownMenu = findViewById(R.id.dropdownMenu);
@@ -124,13 +131,32 @@ public class ExploreListActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+
+        // Enable the user's current location on the map
+        if (!checkSingleLocationPermission()) {
+            ToastHelper.showLongToast(getApplicationContext(), "No location permission.", Toast.LENGTH_SHORT);
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+        // Add markers for media files on the map
+        updateMedia();
+    }
 
 
-
-    private void updateRecyclerView() {
-        // Create a new adapter with the updated media list
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
-        recyclerView.setAdapter(mediaAdapter);
+    private void addMediaMarkers() {
+        // Retrieve the list of media files with their latitude and longitude
+        // Add markers for each media file on the map
+        for (MongoMediaEntry media : mongoMetaList) {
+            LatLng position = new LatLng(media.getLatitude(), media.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(position)
+                    .title(media.getTitle())
+                    .snippet(media.getUploaderName());
+            googleMap.addMarker(markerOptions);
+        }
     }
 
     private void updateMedia() {
@@ -149,11 +175,10 @@ public class ExploreListActivity extends AppCompatActivity {
             public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
                 if (response.isSuccessful()) {
                     List<MongoMediaEntry> mediaEntries = response.body();
-
                     // Handle the retrieved media entries
                     mongoMetaList.clear();
                     mongoMetaList.addAll(mediaEntries);
-                    updateRecyclerView();
+                    addMediaMarkers();
 
                 } else {
                     ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
@@ -170,4 +195,38 @@ public class ExploreListActivity extends AppCompatActivity {
     }
 
 
+    private boolean checkSingleLocationPermission(){
+        int fine_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarse_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        return fine_location == PackageManager.PERMISSION_GRANTED &&
+                coarse_location == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
 }
+
