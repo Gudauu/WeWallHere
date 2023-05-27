@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.gmaps.ExploreMapActivity;
 import com.google.android.material.tabs.TabLayout;
@@ -167,6 +168,15 @@ public class ExploreListActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    // go to main page when scrolling back
+    @Override
+    public void onBackPressed() {
+        // Start the main activity or perform any other navigation action
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
+        startActivity(intent);
     }
 
 

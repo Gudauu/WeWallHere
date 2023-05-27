@@ -50,9 +50,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (checkSingleLocationPermission()) {
-                    Intent intent = new Intent();
-                    intent.setClass(MainActivity.this, ExploreListActivity.class);
-                    startActivity(intent);
+                    goToExploreListActivity();
                 } else {
                     // Request the necessary permissions
                     String[] permissions = new String[]{
@@ -84,14 +82,27 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (allPermissionsGranted) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, ExploreListActivity.class);
-                startActivity(intent);
+                goToExploreListActivity();
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
             }
         }
     }
+    // go to main page when scrolling back
+    @Override
+    public void onBackPressed() {
+        // Start the main activity or perform any other navigation action
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
+        startActivity(intent);
+    }
+    private void goToExploreListActivity(){
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, ExploreListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all activities on top of ListViewActivity
+        startActivity(intent);
+    }
+
     private boolean checkSingleLocationPermission(){
         int fine_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         int coarse_location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);

@@ -239,7 +239,14 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 coarse_location == PackageManager.PERMISSION_GRANTED;
     }
 
-
+    // go to main page when scrolling back
+    @Override
+    public void onBackPressed() {
+        // Start the main activity or perform any other navigation action
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
+        startActivity(intent);
+    }
 
     @Override
     protected void onResume() {
