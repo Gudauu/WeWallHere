@@ -14,7 +14,9 @@ public interface UploadService {
     Call<ResponseBody> uploadImage(
             @Part MultipartBody.Part image,
             @Part("latitude") RequestBody latitude,
-            @Part("longitude") RequestBody longitude
+            @Part("longitude") RequestBody longitude,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content
     );
 
     @Multipart
@@ -22,7 +24,9 @@ public interface UploadService {
     Call<ResponseBody> uploadVideo(
             @Part MultipartBody.Part video,
             @Part("latitude") RequestBody latitude,
-            @Part("longitude") RequestBody longitude
+            @Part("longitude") RequestBody longitude,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content
     );
 }
 
