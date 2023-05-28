@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +55,7 @@ public class DetailPageActivity extends AppCompatActivity {
     private VideoView topvideoView;
     private Toolbar toptitle;
     private TextView textTitle;
+    private RelativeLayout loadingPanel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +89,7 @@ public class DetailPageActivity extends AppCompatActivity {
         topimageView = findViewById(R.id.imageViewMedia);
         topTumbnail = findViewById(R.id.imageViewThumbnail);
         topvideoView = findViewById(R.id.videoViewMedia);
+        loadingPanel = findViewById(R.id.loadingPanel);
         if (isVideoFilename(mongoEntry.getFilename())) {
             String videourl = url_download + "video/" + mongoEntry.getFilename();
             topimageView.setVisibility(View.GONE);
@@ -94,7 +97,6 @@ public class DetailPageActivity extends AppCompatActivity {
 
             MediaController mediaController = new MediaController(getApplicationContext());
             mediaController.setAnchorView(topvideoView);
-
 
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
@@ -108,8 +110,8 @@ public class DetailPageActivity extends AppCompatActivity {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             // Display the thumbnail in an ImageView
-                            holder.imageViewThumbnail.setImageBitmap(resource);
-                            holder.imageViewThumbnail.setVisibility(View.VISIBLE);
+                            topTumbnail.setImageBitmap(resource);
+                            topTumbnail.setVisibility(View.VISIBLE);
                         }
 
                         @Override
@@ -128,8 +130,8 @@ public class DetailPageActivity extends AppCompatActivity {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     try{
-                        holder.loadingPanel.setVisibility(View.GONE);
-                        holder.imageViewThumbnail.setVisibility(View.GONE);
+                        loadingPanel.setVisibility(View.GONE);
+                        topTumbnail.setVisibility(View.GONE);
                     }catch (Exception e){
                         ToastHelper.showLongToast(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
                     }
@@ -140,14 +142,19 @@ public class DetailPageActivity extends AppCompatActivity {
             topvideoView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!topvideoView.isPlaying()) {
-                        // Hide the thumbnail
-                        holder.imageViewThumbnail.setVisibility(View.GONE);
-                        topvideoView.requestFocus();
-                        topvideoView.start();
-                        finalMediaController.show(10); // Show the MediaController
+                    try{
+                        if (!topvideoView.isPlaying()) {
+                            // Hide the thumbnail
+                            topTumbnail.setVisibility(View.GONE);
+                            topvideoView.requestFocus();
+                            topvideoView.start();
+                            finalMediaController.show(10); // Show the MediaController
 
+                        }
+                    }catch (Exception e){
+                        ToastHelper.showLongToast(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
                     }
+
                 }
             });
 
@@ -157,7 +164,7 @@ public class DetailPageActivity extends AppCompatActivity {
             topimageView.setVisibility(View.VISIBLE);
             topvideoView.setVisibility(View.GONE);
 
-            Glide.with(holder.itemView.getContext())
+            Glide.with(getApplicationContext())
                     .load(imagedownloadUrl)
                     .listener(new RequestListener<Drawable>() {
                         @Override
@@ -169,7 +176,7 @@ public class DetailPageActivity extends AppCompatActivity {
                         @Override
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                             // Image loading is successful, hide the loading panel here
-                            holder.loadingPanel.setVisibility(View.GONE);
+                            loadingPanel.setVisibility(View.GONE);
                             return false;
                         }
                     })
