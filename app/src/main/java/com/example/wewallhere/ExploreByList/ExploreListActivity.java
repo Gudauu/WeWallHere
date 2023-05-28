@@ -53,7 +53,7 @@ public class ExploreListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Create and set the adapter for empty mediaList
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
+        mediaAdapter = new MediaAdapter(mongoMetaList, url_download, getApplicationContext());
         recyclerView.setAdapter(mediaAdapter);
         updateMedia();
     }
@@ -130,7 +130,7 @@ public class ExploreListActivity extends AppCompatActivity {
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
+        mediaAdapter = new MediaAdapter(mongoMetaList, url_download, getApplicationContext());
         recyclerView.setAdapter(mediaAdapter);
     }
 
