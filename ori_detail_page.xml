@@ -1,0 +1,34 @@
+commit abc7b8ec3a95b328d0dbf8df345d083e6ed46ca0	HEAD~1
+Author: Gudauu <gudautd@gmail.com>
+Date:   Sun May 28 20:54:46 2023 +0800
+
+    top media video crashes when clicked
+
+diff --git a/app/src/main/res/layout/activity_detail_page.xml b/app/src/main/res/layout/activity_detail_page.xml
+index b8dfddd..e5171ba 100644
+--- a/app/src/main/res/layout/activity_detail_page.xml
++++ b/app/src/main/res/layout/activity_detail_page.xml
+@@ -26,8 +26,9 @@
+                 <ImageView
+                     android:id="@+id/imageViewMedia"
+                     android:layout_width="match_parent"
+-                    android:layout_height="220dp"
+-                    android:scaleType="centerCrop" />
++                    android:layout_height="wrap_content"
++                    android:scaleType="centerCrop"
++                    android:adjustViewBounds="true"/>
+                 <VideoView
+                     android:id="@+id/videoViewMedia"
+                     android:layout_width="match_parent"
+@@ -110,9 +111,10 @@
+                 android:id="@+id/CommentTitle"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+-                android:textSize="19sp"
++                android:textSize="22sp"
+                 android:text="Comments"
+                 android:layout_marginLeft="10dp"
++                android:layout_marginTop="15dp"
+                 android:textStyle="bold" />
+ 
+             <androidx.recyclerview.widget.RecyclerView

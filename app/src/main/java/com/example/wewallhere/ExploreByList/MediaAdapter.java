@@ -67,6 +67,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             holder.videoViewMedia.setVisibility(View.VISIBLE);
 
             MediaController mediaController = new MediaController(holder.itemView.getContext());
+            mediaController = new MediaController(holder.itemView.getContext());
             mediaController.setAnchorView(holder.videoViewMedia);
 
 
@@ -98,14 +99,12 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             MediaController finalMediaController = mediaController;
             holder.videoViewMedia.setMediaController(finalMediaController);
 
-            final boolean[] ready = {false};
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     try{
                         holder.loadingPanel.setVisibility(View.GONE);
                         holder.imageViewThumbnail.setVisibility(View.GONE);
-                        ready[0] = true;
                     }catch (Exception e){
                         ToastHelper.showLongToast(holder.itemView.getContext(), e.getMessage(), Toast.LENGTH_LONG);
                     }
@@ -116,7 +115,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             holder.videoViewMedia.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (ready[0] && !holder.videoViewMedia.isPlaying()) {
+                    if (!holder.videoViewMedia.isPlaying()) {
                         // Hide the thumbnail
                         holder.imageViewThumbnail.setVisibility(View.GONE);
                         holder.videoViewMedia.requestFocus();
