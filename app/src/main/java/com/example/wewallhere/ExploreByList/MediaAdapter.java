@@ -8,7 +8,6 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -62,13 +61,33 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             mediaController = new MediaController(holder.itemView.getContext());
             mediaController.setAnchorView(holder.videoViewMedia);
 
+
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
             holder.videoViewMedia.setVideoURI(videoUri);
-            holder.videoViewMedia.seekTo( 1 );                 // 1 millisecond (0.001 s) into the clip.
+
+            // using glide to render video thumbnail
+            Glide.with(holder.itemView.getContext())
+                    .asBitmap()
+                    .load(videoUri)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            // Display the thumbnail in an ImageView
+                            holder.imageViewThumbnail.setImageBitmap(resource);
+                            holder.imageViewThumbnail.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            // Handle the case where loading the thumbnail fails
+                            super.onLoadFailed(errorDrawable);
+                        }
+                    });
+
+
 
             MediaController finalMediaController = mediaController;
-
             holder.videoViewMedia.setMediaController(finalMediaController);
 
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -76,27 +95,27 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
                 public void onPrepared(MediaPlayer mp) {
                     try{
                         holder.loadingPanel.setVisibility(View.GONE);
-                        finalMediaController.show(7); // Show the MediaController
-
+                        holder.imageViewThumbnail.setVisibility(View.GONE);
                     }catch (Exception e){
                         ToastHelper.showLongToast(holder.itemView.getContext(), e.getMessage(), Toast.LENGTH_LONG);
                     }
 
                 }
             });
-
             // Set an OnClickListener for the VideoView to start the video
             holder.videoViewMedia.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!holder.videoViewMedia.isPlaying()) {
+                        // Hide the thumbnail
+                        holder.imageViewThumbnail.setVisibility(View.GONE);
                         holder.videoViewMedia.requestFocus();
                         holder.videoViewMedia.start();
+                        finalMediaController.show(10); // Show the MediaController
 
                     }
                 }
             });
-
 
         } else {
             String imagedownloadUrl = serverIP + "image/" + mongoEntry.getFilename();
