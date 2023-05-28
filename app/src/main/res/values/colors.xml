@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="colorPrimary">@color/blue_500</color>
+    <color name="colorPrimaryDark">@color/blue_700</color>
+    <color name="colorAccent">@color/pink_500</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +12,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="blue_500">#abc5fe</color>
+    <color name="blue_200">#bed2fe</color>
+    <color name="blue_700">#92ace5</color>
+    <color name="blue_900">#7186b2</color>
+
+    <color name="white_200">#e5dfc8</color>
+    <color name="yellow">#e7cb95</color>
+
+    <color name="pink_200">#d7ae9c</color>
+    <color name="pink_500">#d7806d</color>
+    <color name="pink_700">#f05457</color>
 </resources>
