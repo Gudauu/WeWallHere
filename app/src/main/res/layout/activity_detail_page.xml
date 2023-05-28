@@ -24,25 +24,25 @@
                 android:gravity="center">
 
                 <ImageView
-                    android:id="@+id/imageViewMedia"
+                    android:id="@+id/imageViewDetail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="centerInside"
                     android:adjustViewBounds="true"/>
                 <VideoView
-                    android:id="@+id/videoViewMedia"
+                    android:id="@+id/videoViewDetail"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:visibility="gone"
                     android:layout_gravity="center" />
                 <ImageView
-                    android:id="@+id/imageViewThumbnail"
+                    android:id="@+id/Thumbnail"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:visibility="gone"
                     android:layout_gravity="center" />
                 <RelativeLayout
-                    android:id="@+id/loadingPanel"
+                    android:id="@+id/detailloadingPanel"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center" >
@@ -60,7 +60,7 @@
                 android:orientation="horizontal">
                 <!-- User profile pic -->
                 <ImageView
-                    android:id="@+id/imageViewProfilePic"
+                    android:id="@+id/imageViewProfilePicDetail"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:src="@drawable/ic_launcher_foreground"/>
@@ -72,7 +72,7 @@
                     android:orientation="vertical">
                     <!-- Title -->
                     <TextView
-                        android:id="@+id/textViewContent"
+                        android:id="@+id/textViewContentDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="17sp"
@@ -82,14 +82,14 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical">
                         <TextView
-                            android:id="@+id/textViewUploader"
+                            android:id="@+id/textViewUploaderDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="PotatoHead"
                             android:textSize="15sp"
                             android:layout_alignParentStart="true" />
                         <TextView
-                            android:id="@+id/textViewDate"
+                            android:id="@+id/textViewDateDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="2022-01-01"
