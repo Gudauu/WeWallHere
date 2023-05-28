@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MediaViewHolder extends RecyclerView.ViewHolder {
     public ImageView imageViewMedia;
+    public ImageView imageViewThumbnail;
     public VideoView videoViewMedia;
     public ImageView imageViewProfilePic;
     public TextView textViewTitle;
@@ -30,6 +31,7 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
         textViewUploader = itemView.findViewById(R.id.textViewUploader);
         textViewDate = itemView.findViewById(R.id.textViewDate);
         videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
+        imageViewThumbnail = itemView.findViewById(R.id.imageViewThumbnail);
         loadingPanel = itemView.findViewById(R.id.loadingPanel);
 
 
