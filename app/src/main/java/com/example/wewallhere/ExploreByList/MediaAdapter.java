@@ -67,7 +67,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             holder.videoViewMedia.setVisibility(View.VISIBLE);
 
             MediaController mediaController = new MediaController(holder.itemView.getContext());
-            mediaController = new MediaController(holder.itemView.getContext());
             mediaController.setAnchorView(holder.videoViewMedia);
 
 
