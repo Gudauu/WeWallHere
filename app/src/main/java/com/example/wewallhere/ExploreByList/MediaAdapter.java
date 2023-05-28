@@ -93,11 +93,15 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
                     });
 
 
-            MediaController mediaController = new MediaController(holder.itemView.getContext());
-            mediaController.setAnchorView(holder.videoViewMedia);
-            mediaController.setMediaPlayer(holder.videoViewMedia);
+//            MediaController mediaController = new MediaController(holder.itemView.getContext());
+//            mediaController.setAnchorView(holder.videoViewMedia);
+//            mediaController.setMediaPlayer(holder.videoViewMedia);
 //            MediaController finalMediaController = mediaController;
-            holder.videoViewMedia.setMediaController(mediaController);
+            // Set the MediaController for the VideoView
+            holder.videoViewMedia.setMediaController(holder.mediaController);
+
+            // Update the MediaController's anchor view
+            updateMediaController(holder.mediaController, holder.videoViewMedia);
 
             final boolean[] ready = {false};
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -173,6 +177,18 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             }
         });
     }
+    @Override
+    public void onViewDetachedFromWindow(@NonNull MediaViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.mediaController.hide();
+    }
+
+
+    private void updateMediaController(MediaController mediaController, VideoView videoView) {
+        mediaController.setAnchorView(videoView);
+        mediaController.setMediaPlayer(videoView);
+    }
+
 
     @Override
     public int getItemCount() {

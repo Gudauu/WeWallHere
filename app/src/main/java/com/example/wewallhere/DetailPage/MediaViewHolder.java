@@ -2,6 +2,7 @@ package com.example.wewallhere.DetailPage;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
