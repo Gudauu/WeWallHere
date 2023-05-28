@@ -1,21 +1,36 @@
 package com.example.wewallhere.ExploreByList;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.wewallhere.R;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import Helper.ToastHelper;
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     private List<MongoMediaEntry> mongometaEntries;
@@ -41,21 +56,49 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             String videourl = serverIP + "video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
-//            holder.videoViewMedia.setVideoURI(Uri.parse("http://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4"));
 
-            // control
             MediaController mediaController = new MediaController(holder.itemView.getContext());
             mediaController = new MediaController(holder.itemView.getContext());
             mediaController.setAnchorView(holder.videoViewMedia);
             holder.videoViewMedia.setMediaController(mediaController);
 
-            holder.videoViewMedia.setVideoURI(Uri.parse(videourl));
+
+            // Set the video URI
+            Uri videoUri = Uri.parse(videourl);
+            holder.videoViewMedia.setVideoURI(videoUri);
+
+            // using glide to render video thumbnail
+            Glide.with(holder.itemView.getContext())
+                    .asBitmap()
+                    .load(videoUri)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            // Display the thumbnail in an ImageView
+                            holder.imageViewThumbnail.setImageBitmap(resource);
+                            holder.imageViewThumbnail.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            // Handle the case where loading the thumbnail fails
+                            super.onLoadFailed(errorDrawable);
+                        }
+                    });
+
+
+
             MediaController finalMediaController = mediaController;
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-//                    holder.videoViewMedia.start();
-                    finalMediaController.show(); // Show the MediaController
+                    try{
+                        holder.loadingPanel.setVisibility(View.GONE);
+                        finalMediaController.show(); // Show the MediaController
+                    }catch (Exception e){
+                        ToastHelper.showLongToast(holder.itemView.getContext(), e.getMessage(), Toast.LENGTH_LONG);
+                    }
+
                 }
             });
             // Set an OnClickListener for the VideoView to start the video
@@ -63,16 +106,20 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if (!holder.videoViewMedia.isPlaying()) {
+                        // Hide the thumbnail
+                        holder.imageViewThumbnail.setVisibility(View.GONE);
                         holder.videoViewMedia.start();
                     }
                 }
             });
-
-//            holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//                public void onPrepared(MediaPlayer mp) {
-//                    holder.videoViewMedia.start();
+//            // Set a completion listener to show the thumbnail again after the video finishes playing
+//            holder.videoViewMedia.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mp) {
+//                    holder.imageViewThumbnail.setVisibility(View.VISIBLE);
 //                }
 //            });
+
         } else {
             String imagedownloadUrl = serverIP + "image/" + mongoEntry.getFilename();
 
@@ -81,6 +128,20 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 
             Glide.with(holder.itemView.getContext())
                     .load(imagedownloadUrl)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            // Handle the image loading failure if needed
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            // Image loading is successful, hide the loading panel here
+                            holder.loadingPanel.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
                     .into(holder.imageViewMedia);
         }
 
