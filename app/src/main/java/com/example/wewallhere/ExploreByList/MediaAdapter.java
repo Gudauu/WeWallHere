@@ -95,8 +95,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 
             MediaController mediaController = new MediaController(holder.itemView.getContext());
             mediaController.setAnchorView(holder.videoViewMedia);
-            MediaController finalMediaController = mediaController;
-            holder.videoViewMedia.setMediaController(finalMediaController);
+            mediaController.setMediaPlayer(holder.videoViewMedia);
+//            MediaController finalMediaController = mediaController;
+            holder.videoViewMedia.setMediaController(mediaController);
 
             final boolean[] ready = {false};
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
