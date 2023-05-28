@@ -159,10 +159,15 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
         holder.details.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, DetailPageActivity.class);
-                intent.putExtra("MongoMediaEntry", mongoEntry);
-                // save the media info for the new activity
-                context.startActivity(intent);
+                try{
+                    Intent intent = new Intent(context, DetailPageActivity.class);
+                    intent.putExtra("MongoMediaEntry", mongoEntry);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }catch (Exception e){
+                    ToastHelper.showLongToast(context, e.getMessage(), Toast.LENGTH_LONG);
+                }
+
             }
         });
     }

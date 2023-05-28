@@ -2,6 +2,7 @@ package com.example.wewallhere.ExploreByList;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,7 +21,7 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
     public TextView textViewUploader;
     public TextView textViewDate;
     public RelativeLayout loadingPanel;
-    public RelativeLayout details;
+    public LinearLayout details;
 //    public MediaController mediaController;
 
 
@@ -33,8 +34,8 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
         textViewDate = itemView.findViewById(R.id.textViewDate);
         videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
         imageViewThumbnail = itemView.findViewById(R.id.imageViewThumbnail);
-        loadingPanel = itemView.findViewById(R.id.loadingPanel);
         details = itemView.findViewById(R.id.details);
+        loadingPanel = itemView.findViewById(R.id.loadingPanel);
 
 
 

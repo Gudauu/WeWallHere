@@ -2,6 +2,7 @@ package com.example.wewallhere.DetailPage;
 
 import android.os.Bundle;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,12 +33,13 @@ public class DetailPageActivity extends AppCompatActivity {
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
     private Toolbar toptitle;
+    private TextView textTitle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_explore_list);
+        setContentView(R.layout.activity_detail_page);
 
-        MongoMediaEntry top_mongoEntry = (MongoMediaEntry) getIntent().getSerializableExtra("MongoEntry");
+        MongoMediaEntry top_mongoEntry = (MongoMediaEntry) getIntent().getSerializableExtra("MongoMediaEntry");
         mongoMetaList.clear();
         mongoMetaList.add(top_mongoEntry);
 
@@ -98,7 +100,10 @@ public class DetailPageActivity extends AppCompatActivity {
     }
     private void initTitleBar(String title){
         toptitle = findViewById(R.id.titlebar);
-        // Set as the action bar
         setSupportActionBar(toptitle);
+        
+        textTitle = findViewById(R.id.textViewHeadTitle);
+        textTitle.setText(title);
+        // Set as the action bar
     }
 }
