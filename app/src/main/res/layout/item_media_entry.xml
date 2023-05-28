@@ -50,6 +50,7 @@
 
     <!-- User profile pic, title, uploader name, date of uploading -->
     <LinearLayout
+        android:id="@+id/details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">

@@ -1,5 +1,7 @@
 package com.example.wewallhere.ExploreByList;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
@@ -23,7 +25,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.wewallhere.DetailPage.DetailPageActivity;
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.Upload.ComposeActivity;
+import com.example.wewallhere.Upload.UploadActivity;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,10 +42,12 @@ import Helper.ToastHelper;
 public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     private List<MongoMediaEntry> mongometaEntries;
     private String serverIP;
+    private Context context; // Add Context as a member variable
 
-    public MediaAdapter(List<MongoMediaEntry> mongometaEntries, String serverIP) {
+    public MediaAdapter(List<MongoMediaEntry> mongometaEntries, String serverIP, Context context) {
         this.mongometaEntries = mongometaEntries;
         this.serverIP = serverIP;
+        this.context = context; // Store the context
     }
 
     @NonNull
@@ -147,6 +156,15 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 
         holder.textViewTitle.setText(mongoEntry.getTitle());
         holder.textViewDate.setText(mongoEntry.getTimestamp());
+        holder.details.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, DetailPageActivity.class);
+                intent.putExtra("MongoMediaEntry", mongoEntry);
+                // save the media info for the new activity
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

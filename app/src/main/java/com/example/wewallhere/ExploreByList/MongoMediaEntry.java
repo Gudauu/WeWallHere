@@ -2,11 +2,12 @@ package com.example.wewallhere.ExploreByList;
 
 import com.example.wewallhere.R;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MongoMediaEntry {
+public class MongoMediaEntry implements Serializable {
     private String filename;
     private String path;
     private double latitude;
