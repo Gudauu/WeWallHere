@@ -21,32 +21,31 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.wewallhere.DetailPage.MediaViewHolderTop;
-import com.example.wewallhere.DetailPage.MongoMediaEntry;
+import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
 
 import java.util.List;
 
 import Helper.ToastHelper;
 
-public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
+public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     private List<MongoMediaEntry> mongometaEntries;
     private String serverIP;
 
-    public MediaAdapterTop(List<MongoMediaEntry> mongometaEntries, String serverIP) {
+    public MediaAdapter(List<MongoMediaEntry> mongometaEntries, String serverIP) {
         this.mongometaEntries = mongometaEntries;
         this.serverIP = serverIP;
     }
 
     @NonNull
     @Override
-    public MediaViewHolderTop onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MediaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_media_entry, parent, false);
-        return new MediaViewHolderTop(view);
+        return new MediaViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MediaViewHolderTop holder, int position) {
+    public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
         MongoMediaEntry mongoEntry = mongometaEntries.get(position);
 
         if (isVideoFilename(mongoEntry.getFilename())) {
@@ -142,7 +141,7 @@ public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
 //        holder.imageViewProfilePic.setImageResource(mongoEntry.getProfilePicResId());
         //        holder.textViewUploader.setText(mongoEntry.getUploaderName());
 
-        holder.textViewContent.setText(mongoEntry.getContent());
+        holder.textViewTitle.setText(mongoEntry.getTitle());
         holder.textViewDate.setText(mongoEntry.getTimestamp());
     }
 
