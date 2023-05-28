@@ -79,17 +79,17 @@ public class DetailPageActivity extends AppCompatActivity {
     }
 
     private void iniTopMedia(MongoMediaEntry mongoEntry){
-        TextView content = findViewById(R.id.textViewContent);
+        TextView content = findViewById(R.id.textViewContentDetail);
         content.setText(mongoEntry.getContent());
-//        TextView author = findViewById(R.id.textViewUploader);
+//        TextView author = findViewById(R.id.textViewUploaderDetail);
 //        author.setText(uploader);
-        TextView time = findViewById(R.id.textViewDate);
+        TextView time = findViewById(R.id.textViewDateDetail);
         time.setText(mongoEntry.getTimestamp());
         // load media
-        topimageView = findViewById(R.id.imageViewMedia);
-        topTumbnail = findViewById(R.id.imageViewThumbnail);
-        topvideoView = findViewById(R.id.videoViewMedia);
-        loadingPanel = findViewById(R.id.loadingPanel);
+        topimageView = findViewById(R.id.imageViewDetail);
+        topTumbnail = findViewById(R.id.Thumbnail);
+        topvideoView = findViewById(R.id.videoViewDetail);
+        loadingPanel = findViewById(R.id.detailloadingPanel);
         if (isVideoFilename(mongoEntry.getFilename())) {
             String videourl = url_download + "video/" + mongoEntry.getFilename();
             topimageView.setVisibility(View.GONE);
@@ -97,6 +97,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
             MediaController mediaController = new MediaController(getApplicationContext());
             mediaController.setAnchorView(topvideoView);
+            topvideoView.setMediaController(mediaController);
 
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
@@ -122,33 +123,33 @@ public class DetailPageActivity extends AppCompatActivity {
                     });
 
 
+//            MediaController finalMediaController = mediaController;
+//            topvideoView.setMediaController(null); // Remove existing MediaController
+//            topvideoView.setMediaController(finalMediaController);
 
-            MediaController finalMediaController = mediaController;
-            topvideoView.setMediaController(finalMediaController);
-
-            topvideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    try{
-                        loadingPanel.setVisibility(View.GONE);
-                        topTumbnail.setVisibility(View.GONE);
-                    }catch (Exception e){
-                        ToastHelper.showLongToast(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
-                    }
-
-                }
-            });
+//            final boolean[] ready = {false};
+//            topvideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                @Override
+//                public void onPrepared(MediaPlayer mp) {
+//                    try{
+//                        loadingPanel.setVisibility(View.GONE);
+//                        topTumbnail.setVisibility(View.GONE);
+//                        ready[0] = true;
+//                    }catch (Exception e){
+//                        ToastHelper.showLongToast(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
+//                    }
+//
+//                }
+//            });
             // Set an OnClickListener for the VideoView to start the video
             topvideoView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try{
                         if (!topvideoView.isPlaying()) {
-                            // Hide the thumbnail
-                            topTumbnail.setVisibility(View.GONE);
                             topvideoView.requestFocus();
                             topvideoView.start();
-                            finalMediaController.show(10); // Show the MediaController
+//                            finalMediaController.show(10); // Show the MediaController
 
                         }
                     }catch (Exception e){
