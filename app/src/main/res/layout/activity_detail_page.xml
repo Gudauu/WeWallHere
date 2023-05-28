@@ -26,8 +26,9 @@
                 <ImageView
                     android:id="@+id/imageViewMedia"
                     android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:scaleType="centerCrop" />
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
                 <VideoView
                     android:id="@+id/videoViewMedia"
                     android:layout_width="match_parent"
@@ -110,9 +111,10 @@
                 android:id="@+id/CommentTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="19sp"
+                android:textSize="22sp"
                 android:text="Comments"
                 android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
