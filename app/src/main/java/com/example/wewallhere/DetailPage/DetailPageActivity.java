@@ -43,17 +43,21 @@ import com.example.wewallhere.DetailPage.DetailPageActivity;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.example.wewallhere.DetailPage.UploadCommentService;
 import com.example.wewallhere.gmaps.SingleLocation;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import Helper.ToastHelper;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -61,6 +65,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import okhttp3.Request;
 
 public class DetailPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -418,21 +423,27 @@ public class DetailPageActivity extends AppCompatActivity {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url_media_service) // Replace with your server's IP address
                     .build();
-
-            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneUniqueID()));
-            RequestBody ID_reply = RequestBody.create(MediaType.parse("text/plain"), replyID);
-            RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
-            RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
+//            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneUniqueID()));
+//            RequestBody ID_reply = RequestBody.create(MediaType.parse("text/plain"), replyID);
+//            RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
+//            RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
 
 
             // Create an instance of the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
 
+            // Create a HashMap with your data
+            HashMap<String, String> data = new HashMap<>();
+            data.put("ID", geneUniqueID());
+            data.put("ID_reply", replyID);
+            data.put("title", title);
+            data.put("content", content);
+
             // Send the image file to the server
-            Call<ResponseBody> call = UploadCommentService.uploadText(ID, ID_reply, contentTitle, contentBody);
-            call.enqueue(new Callback<ResponseBody>() {
+            Call<Void> call = UploadCommentService.uploadText(data);
+            call.enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         // Image uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
@@ -444,13 +455,13 @@ public class DetailPageActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(Call<Void> call, Throwable t) {
                     // Handle network failure
                     ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e) {
-            ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed:" + e.getMessage(), Toast.LENGTH_LONG);
+            ToastHelper.showLongToast(DetailPageActivity.this, "comment post failed: " + e.getMessage(), Toast.LENGTH_LONG);
         }
     }
     // helper function in video upload
