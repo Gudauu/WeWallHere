@@ -99,6 +99,7 @@ public class ComposeActivity extends AppCompatActivity {
             String fileName = "image_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
             MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", fileName, requestBody);
 
+            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneuniqueID()));
             RequestBody latitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(latitude));
             RequestBody longitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(longitude));
 
@@ -110,7 +111,7 @@ public class ComposeActivity extends AppCompatActivity {
             UploadService uploadService = retrofit.create(UploadService.class);
 
             // Send the image file to the server
-            Call<ResponseBody> call = uploadService.uploadImage(imagePart, latitudeBody, longitudeBody,titleBody, contentBody);
+            Call<ResponseBody> call = uploadService.uploadImage(ID, imagePart, latitudeBody, longitudeBody,titleBody, contentBody);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -152,6 +153,8 @@ public class ComposeActivity extends AppCompatActivity {
                     .build();
 
 
+            String str_ID = System.currentTimeMillis() + "_" + new Random().nextInt(1000) + "_" + new Random().nextInt(1000);
+            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(str_ID));
 
             // Create the request body for video, latitude and longitude
             InputStream inputStream = getContentResolver().openInputStream(videoUri);
@@ -170,7 +173,7 @@ public class ComposeActivity extends AppCompatActivity {
             UploadService uploadService = retrofit.create(UploadService.class);
 
             // Create the API call to upload the video
-            Call<ResponseBody> call = uploadService.uploadVideo(videoPart, latitudeBody, longitudeBody,titleBody, contentBody);
+            Call<ResponseBody> call = uploadService.uploadVideo(ID, videoPart, latitudeBody, longitudeBody,titleBody, contentBody);
 
             // Enqueue the API call
             call.enqueue(new Callback<ResponseBody>() {
@@ -196,6 +199,10 @@ public class ComposeActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private String geneuniqueID(){
+        return System.currentTimeMillis() + "_" + new Random().nextInt(1000) + "_" + new Random().nextInt(1000);
     }
 
 }
