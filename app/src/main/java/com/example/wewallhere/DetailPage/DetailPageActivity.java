@@ -38,7 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private MediaAdapterTop mediaAdapterTop;
+    private CommentAdapter commentAdapter;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
@@ -219,8 +219,8 @@ public class DetailPageActivity extends AppCompatActivity {
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
-        mediaAdapterTop = new MediaAdapterTop(mongoMetaList, url_download);
-        recyclerView.setAdapter(mediaAdapterTop);
+        commentAdapter = new CommentAdapter(mongoMetaList, url_download);
+        recyclerView.setAdapter(commentAdapter);
     }
     private void initTitleBar(String title){
         toptitle = findViewById(R.id.titlebar);
