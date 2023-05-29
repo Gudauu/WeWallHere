@@ -28,24 +28,24 @@ import java.util.List;
 
 import Helper.ToastHelper;
 
-public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
+public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
     private List<MongoMediaEntry> mongometaEntries;
     private String serverIP;
 
-    public MediaAdapter(List<MongoMediaEntry> mongometaEntries, String serverIP) {
+    public MediaAdapterTop(List<MongoMediaEntry> mongometaEntries, String serverIP) {
         this.mongometaEntries = mongometaEntries;
         this.serverIP = serverIP;
     }
 
     @NonNull
     @Override
-    public MediaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MediaViewHolderTop onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_media_entry, parent, false);
-        return new MediaViewHolder(view);
+        return new MediaViewHolderTop(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MediaViewHolderTop holder, int position) {
         MongoMediaEntry mongoEntry = mongometaEntries.get(position);
 
         if (isVideoFilename(mongoEntry.getFilename())) {
@@ -53,9 +53,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
 
-            MediaController mediaController = new MediaController(holder.itemView.getContext());
-            mediaController = new MediaController(holder.itemView.getContext());
-            mediaController.setAnchorView(holder.videoViewMedia);
+//            MediaController mediaController = new MediaController(holder.itemView.getContext());
+//            mediaController = new MediaController(holder.itemView.getContext());
+//            mediaController.setAnchorView(holder.videoViewMedia);
 
 
             // Set the video URI
@@ -83,8 +83,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 
 
 
-            MediaController finalMediaController = mediaController;
-            holder.videoViewMedia.setMediaController(finalMediaController);
+//            MediaController finalMediaController = mediaController;
+//            holder.videoViewMedia.setMediaController(finalMediaController);
 
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -107,7 +107,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
                         holder.imageViewThumbnail.setVisibility(View.GONE);
                         holder.videoViewMedia.requestFocus();
                         holder.videoViewMedia.start();
-                        finalMediaController.show(10); // Show the MediaController
+//                        finalMediaController.show(10); // Show the MediaController
 
                     }
                 }

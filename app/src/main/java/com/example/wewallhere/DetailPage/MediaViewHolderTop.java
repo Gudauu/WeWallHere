@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wewallhere.R;
 
-public class MediaViewHolder extends RecyclerView.ViewHolder {
+public class MediaViewHolderTop extends RecyclerView.ViewHolder {
     public ImageView imageViewMedia;
     public ImageView imageViewThumbnail;
     public VideoView videoViewMedia;
@@ -24,7 +24,7 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
 //    public MediaController mediaController;
 
 
-    public MediaViewHolder(@NonNull View itemView) {
+    public MediaViewHolderTop(@NonNull View itemView) {
         super(itemView);
         imageViewMedia = itemView.findViewById(R.id.imageViewMedia);
         imageViewProfilePic = itemView.findViewById(R.id.imageViewProfilePic);
