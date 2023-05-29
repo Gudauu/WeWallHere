@@ -44,6 +44,7 @@ import com.example.wewallhere.Upload.UploadActivity;
 import com.example.wewallhere.DetailPage.UploadCommentService;
 import com.example.wewallhere.gmaps.SingleLocation;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -432,15 +433,24 @@ public class DetailPageActivity extends AppCompatActivity {
             // Create an instance of the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
 
-            // Create a HashMap with your data
-            HashMap<String, String> data = new HashMap<>();
-            data.put("ID", geneUniqueID());
-            data.put("ID_reply", replyID);
-            data.put("title", title);
-            data.put("content", content);
+//            // Create a HashMap with your data
+//            HashMap<String, String> data = new HashMap<>();
+//            data.put("ID", geneUniqueID());
+//            data.put("ID_reply", replyID);
+//            data.put("title", title);
+//            data.put("content", content);
+
+            // Create a JsonObject and add your data
+            JsonObject data = new JsonObject();
+            data.addProperty("ID", geneUniqueID());
+            data.addProperty("ID_reply", replyID);
+            data.addProperty("title", replyID);
+            data.addProperty("content", content);
+
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
 
             // Send the image file to the server
-            Call<Void> call = UploadCommentService.uploadText(data);
+            Call<Void> call = UploadCommentService.uploadText(requestBody);
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
