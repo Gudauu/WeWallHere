@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,8 +87,9 @@ public class DetailPageActivity extends AppCompatActivity {
             topimageView.setVisibility(View.GONE);
             topvideoView.setVisibility(View.VISIBLE);
 
-//            MediaController mediaController = new MediaController(getApplicationContext());
-//            mediaController.setAnchorView(topvideoView);
+            MediaController mediaController = new MediaController(this);
+            mediaController.setAnchorView(topvideoView);
+            topvideoView.setMediaController(mediaController);
 
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
