@@ -72,7 +72,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
             holder.videoViewMedia.setVideoURI(videoUri);
-            holder.videoViewMedia.seekTo( 1 );
+//            holder.videoViewMedia.seekTo( 1 );
 
 
             // using glide to render video thumbnail

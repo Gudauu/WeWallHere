@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.wewallhere.ExploreByList.MediaViewHolder;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
 
@@ -56,6 +58,12 @@ public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
 //            MediaController mediaController = new MediaController(holder.itemView.getContext());
 //            mediaController = new MediaController(holder.itemView.getContext());
 //            mediaController.setAnchorView(holder.videoViewMedia);
+
+            // Set the MediaController for the VideoView
+            holder.videoViewMedia.setMediaController(holder.mediaController);
+
+            // Update the MediaController's anchor view
+            holder.mediaController.setAnchorView(holder.videoViewMedia);
 
 
             // Set the video URI
@@ -107,6 +115,7 @@ public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
                         holder.imageViewThumbnail.setVisibility(View.GONE);
                         holder.videoViewMedia.requestFocus();
                         holder.videoViewMedia.start();
+                        holder.mediaController.show();
 //                        finalMediaController.show(10); // Show the MediaController
 
                     }
@@ -145,6 +154,19 @@ public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
         holder.textViewDate.setText(mongoEntry.getTimestamp());
     }
 
+        @Override
+    public void onViewDetachedFromWindow(@NonNull MediaViewHolderTop holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.mediaController.hide();
+    }
+
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull MediaViewHolderTop holder) {
+        super.onViewAttachedToWindow(holder);
+        holder.mediaController.setAnchorView(holder.videoViewMedia);
+    }
+
     @Override
     public int getItemCount() {
         return mongometaEntries.size();
@@ -153,5 +175,6 @@ public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
     private boolean isVideoFilename(String filename) {
         return filename.startsWith("video");
     }
+
 }
 
