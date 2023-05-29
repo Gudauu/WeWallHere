@@ -1,13 +1,22 @@
 package com.example.wewallhere.DetailPage;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +39,9 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
+import com.example.wewallhere.Upload.ComposeActivity;
+import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.gmaps.SingleLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +62,17 @@ public class DetailPageActivity extends AppCompatActivity {
     private Toolbar toptitle;
     private TextView textTitle;
     private RelativeLayout loadingPanel;
+    private ImageView reply;
+    // Declare the dialog and its views
+    private Dialog commentDialog;
+    private EditText editTextComment;
+    private RadioButton radioButtonImage;
+    private RadioButton radioButtonVideo;
+    private Button buttonUploadMedia;
+    private Button buttonSubmit;
+    private Button buttonCancel;
+    private int REQUEST_VIDEO_PICK = 6723;
+    private int REQUEST_IMAGE_PICK = 6724;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +84,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
         initTitleBar(top_mongoEntry.getTitle());
         iniTopMedia(top_mongoEntry);
+        iniCommentDialog();
 
 //        // Initialize the RecyclerView
 //        recyclerView = findViewById(R.id.recyclerView);
@@ -82,6 +108,7 @@ public class DetailPageActivity extends AppCompatActivity {
         topTumbnail = findViewById(R.id.Thumbnail);
         topvideoView = findViewById(R.id.videoViewDetail);
         loadingPanel = findViewById(R.id.detailloadingPanel);
+        reply = findViewById(R.id.reply);
         if (isVideoFilename(mongoEntry.getFilename())) {
             String videourl = url_download + "video/" + mongoEntry.getFilename();
             topimageView.setVisibility(View.GONE);
@@ -177,7 +204,59 @@ public class DetailPageActivity extends AppCompatActivity {
         }
 
     }
-    
+
+    private void iniCommentDialog(){
+        commentDialog = new Dialog(this);
+        commentDialog.setContentView(R.layout.dialog_comment);
+
+        editTextComment = commentDialog.findViewById(R.id.editTextComment);
+        radioButtonImage = commentDialog.findViewById(R.id.radioButtonImage);
+        radioButtonVideo = commentDialog.findViewById(R.id.radioButtonVideo);
+        buttonUploadMedia = commentDialog.findViewById(R.id.buttonUploadMedia);
+        buttonSubmit = commentDialog.findViewById(R.id.buttonSubmit);
+        buttonCancel = commentDialog.findViewById(R.id.buttonCancel);
+
+        
+
+        buttonUploadMedia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (radioButtonImage.isChecked()) {
+                    // Handle image upload
+                } else if (radioButtonVideo.isChecked()) {
+                    // Handle video upload
+                } else {
+                    // Show an error message if neither radio button is checked
+                }
+            }
+        });
+
+        buttonSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String comment = editTextComment.getText().toString();
+                // Handle the submission of the comment and selected media
+                commentDialog.dismiss();
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Close the dialog without any action
+                commentDialog.dismiss();
+            }
+        });
+
+        reply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentDialog.show();
+            }
+        });
+
+
+    }
 
 
 
@@ -229,6 +308,73 @@ public class DetailPageActivity extends AppCompatActivity {
         textTitle = findViewById(R.id.textViewHeadTitle);
         textTitle.setText(title);
         // Set as the action bar
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
+
+        } else if (requestCode == REQUEST_VIDEO_PICK && resultCode == RESULT_OK && data != null) {
+            Uri selectedVideoUri = data.getData();
+
+        }
+    }
+
+    // media: check permission Select image & video from gallery
+    private void selectImagePermissionCheck() {
+        if (checkImagePermission()) {
+            startImagePickerIntent();
+        } else {
+            // Request the necessary permissions
+            String[] permissions = new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            };
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_IMAGE_PICK);
+        }
+    }
+    private void selectVideoPermissionCheck() {
+        if (checkVideoPermission()) {
+            // Permissions are already granted, open the video selection intent
+            startVideoPickerIntent();
+        } else {
+            // Request the necessary permissions
+            String[] permissions = new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA
+            };
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_VIDEO_PICK);
+        }
+    }
+    // media: invoke picker
+    private void startImagePickerIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+    }
+    private void startVideoPickerIntent() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("video/*");
+        startActivityForResult(intent, REQUEST_VIDEO_PICK);
+    }
+    // media: permission
+    private boolean checkVideoPermission() {
+        // Check if the required permissions are granted
+        int readStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int writeStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int cameraPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+
+        return readStoragePermission == PackageManager.PERMISSION_GRANTED &&
+                writeStoragePermission == PackageManager.PERMISSION_GRANTED &&
+                cameraPermission == PackageManager.PERMISSION_GRANTED;
+    }
+    private boolean checkImagePermission() {
+        // Check if the required permissions are granted
+        int readStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        return readStoragePermission == PackageManager.PERMISSION_GRANTED;
     }
     private boolean isVideoFilename(String filename) {
         return filename.startsWith("video");
