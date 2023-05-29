@@ -7,9 +7,7 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.MediaController;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,7 +20,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.wewallhere.ExploreByList.MediaViewHolder;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
 
@@ -30,24 +27,24 @@ import java.util.List;
 
 import Helper.ToastHelper;
 
-public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
+public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
     private List<MongoMediaEntry> mongometaEntries;
     private String serverIP;
 
-    public MediaAdapterTop(List<MongoMediaEntry> mongometaEntries, String serverIP) {
+    public CommentAdapter(List<MongoMediaEntry> mongometaEntries, String serverIP) {
         this.mongometaEntries = mongometaEntries;
         this.serverIP = serverIP;
     }
 
     @NonNull
     @Override
-    public MediaViewHolderTop onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_media_entry, parent, false);
-        return new MediaViewHolderTop(view);
+        return new CommentViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MediaViewHolderTop holder, int position) {
+    public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         MongoMediaEntry mongoEntry = mongometaEntries.get(position);
 
         if (isVideoFilename(mongoEntry.getFilename())) {
@@ -155,14 +152,14 @@ public class MediaAdapterTop extends RecyclerView.Adapter<MediaViewHolderTop> {
     }
 
         @Override
-    public void onViewDetachedFromWindow(@NonNull MediaViewHolderTop holder) {
+    public void onViewDetachedFromWindow(@NonNull CommentViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         holder.mediaController.hide();
     }
 
 
     @Override
-    public void onViewAttachedToWindow(@NonNull MediaViewHolderTop holder) {
+    public void onViewAttachedToWindow(@NonNull CommentViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         holder.mediaController.setAnchorView(holder.videoViewMedia);
     }
