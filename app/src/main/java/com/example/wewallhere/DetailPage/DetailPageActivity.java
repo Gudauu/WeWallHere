@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private MediaAdapter mediaAdapter;
+    private MediaAdapterTop mediaAdapterTop;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
@@ -218,8 +217,8 @@ public class DetailPageActivity extends AppCompatActivity {
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
-        mediaAdapter = new MediaAdapter(mongoMetaList, url_download);
-        recyclerView.setAdapter(mediaAdapter);
+        mediaAdapterTop = new MediaAdapterTop(mongoMetaList, url_download);
+        recyclerView.setAdapter(mediaAdapterTop);
     }
     private void initTitleBar(String title){
         toptitle = findViewById(R.id.titlebar);
