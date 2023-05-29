@@ -72,6 +72,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
             holder.videoViewMedia.setVideoURI(videoUri);
+            holder.videoViewMedia.seekTo( 1 );
+
 
             // using glide to render video thumbnail
             Glide.with(holder.itemView.getContext())
@@ -98,10 +100,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 //            mediaController.setMediaPlayer(holder.videoViewMedia);
 //            MediaController finalMediaController = mediaController;
             // Set the MediaController for the VideoView
-            holder.videoViewMedia.setMediaController(holder.mediaController);
+//            holder.videoViewMedia.setMediaController(holder.mediaController);
 
             // Update the MediaController's anchor view
-            updateMediaController(holder.mediaController, holder.videoViewMedia);
+//            updateMediaController(holder.mediaController, holder.videoViewMedia);
 
             final boolean[] ready = {false};
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -128,6 +130,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
                         holder.videoViewMedia.start();
 //                        finalMediaController.show(10); // Show the MediaController
 
+                    }else if (holder.videoViewMedia.isPlaying()) {
+                        holder.videoViewMedia.pause();
                     }
                 }
             });
@@ -177,17 +181,17 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             }
         });
     }
-    @Override
-    public void onViewDetachedFromWindow(@NonNull MediaViewHolder holder) {
-        super.onViewDetachedFromWindow(holder);
-        holder.mediaController.hide();
-    }
+//    @Override
+//    public void onViewDetachedFromWindow(@NonNull MediaViewHolder holder) {
+//        super.onViewDetachedFromWindow(holder);
+//        holder.mediaController.hide();
+//    }
 
 
-    private void updateMediaController(MediaController mediaController, VideoView videoView) {
-        mediaController.setAnchorView(videoView);
-        mediaController.setMediaPlayer(videoView);
-    }
+//    private void updateMediaController(MediaController mediaController, VideoView videoView) {
+//        mediaController.setAnchorView(videoView);
+//        mediaController.setMediaPlayer(videoView);
+//    }
 
 
     @Override
