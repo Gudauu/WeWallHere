@@ -64,7 +64,7 @@ public class DetailPageActivity extends AppCompatActivity {
     private CommentAdapter commentAdapter;
     private List<MongoCommentEntry> mongoCommentList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
-    private String url_download = "http://54.252.196.140:3000/downloadComment/";
+    private String url_download = "http://54.252.196.140:3000/download/";
     private ImageView topimageView;
     private ImageView topTumbnail;
     private VideoView topvideoView;
@@ -296,7 +296,7 @@ public class DetailPageActivity extends AppCompatActivity {
         // Create a service interface for your API endpoints
         MongoCommentService mongoCommentService = retrofit.create(MongoCommentService.class);
         // Make an API call to retrieve media files
-        Call<List<MongoCommentEntry>> call = mongoCommentService.getCommentMetaList("comment");  // , "image_1684667427711_388"
+        Call<List<MongoCommentEntry>> call = mongoCommentService.getCommentMetaList(topID);  // , "image_1684667427711_388"
         call.enqueue(new Callback<List<MongoCommentEntry>>() {
             @Override
             public void onResponse(Call<List<MongoCommentEntry>> call, Response<List<MongoCommentEntry>> response) {

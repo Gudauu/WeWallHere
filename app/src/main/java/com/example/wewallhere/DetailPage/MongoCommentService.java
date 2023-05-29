@@ -7,8 +7,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface MongoCommentService{
-    @GET("mongometa/{type}")
+    @GET("mongometa/comment/{ID_reply}")
     Call<List<MongoCommentEntry>> getCommentMetaList(
-            @Path("type") String type
+            @Path("ID_reply") String ID_reply
     );
 }
