@@ -1,5 +1,6 @@
 package com.example.wewallhere.DetailPage;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -20,7 +21,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
 
 import java.util.List;
@@ -28,12 +28,14 @@ import java.util.List;
 import Helper.ToastHelper;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
-    private List<MongoMediaEntry> mongometaEntries;
+    private List<MongoCommentEntry> mongocommentEntries;
     private String serverIP;
+    private Context context;
 
-    public CommentAdapter(List<MongoMediaEntry> mongometaEntries, String serverIP) {
-        this.mongometaEntries = mongometaEntries;
+    public CommentAdapter(List<MongoCommentEntry> mongocommentEntries, String serverIP, Context context) {
+        this.mongocommentEntries = mongocommentEntries;
         this.serverIP = serverIP;
+        this.context = context;
     }
 
     @NonNull
@@ -45,22 +47,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-        MongoMediaEntry mongoEntry = mongometaEntries.get(position);
+        MongoCommentEntry mongoEntry = mongocommentEntries.get(position);
 
-        if (isVideoFilename(mongoEntry.getFilename())) {
+        if (mongoEntry.getType().equals("video")) {
             String videourl = serverIP + "video/" + mongoEntry.getFilename();
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
-
-//            MediaController mediaController = new MediaController(holder.itemView.getContext());
-//            mediaController = new MediaController(holder.itemView.getContext());
-//            mediaController.setAnchorView(holder.videoViewMedia);
-
-            // Set the MediaController for the VideoView
-            holder.videoViewMedia.setMediaController(holder.mediaController);
-
-            // Update the MediaController's anchor view
-            holder.mediaController.setAnchorView(holder.videoViewMedia);
 
 
             // Set the video URI
@@ -86,11 +78,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
                         }
                     });
 
-
-
-//            MediaController finalMediaController = mediaController;
-//            holder.videoViewMedia.setMediaController(finalMediaController);
-
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -112,14 +99,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
                         holder.imageViewThumbnail.setVisibility(View.GONE);
                         holder.videoViewMedia.requestFocus();
                         holder.videoViewMedia.start();
-                        holder.mediaController.show();
-//                        finalMediaController.show(10); // Show the MediaController
-
                     }
                 }
             });
 
-        } else {
+        } else if(mongoEntry.getType().equals("image")){
             String imagedownloadUrl = serverIP + "image/" + mongoEntry.getFilename();
 
             holder.imageViewMedia.setVisibility(View.VISIBLE);
@@ -142,36 +126,25 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
                         }
                     })
                     .into(holder.imageViewMedia);
+        }else{  // text comment
+            holder.imageViewMedia.setVisibility(View.GONE);
+            holder.videoViewMedia.setVisibility(View.GONE);
+            holder.loadingPanel.setVisibility(View.GONE);
         }
 
-//        holder.imageViewProfilePic.setImageResource(mongoEntry.getProfilePicResId());
+        //        holder.imageViewProfilePic.setImageResource(mongoEntry.getProfilePicResId());
         //        holder.textViewUploader.setText(mongoEntry.getUploaderName());
 
         holder.textViewTitle.setText(mongoEntry.getTitle());
         holder.textViewDate.setText(mongoEntry.getTimestamp());
     }
 
-        @Override
-    public void onViewDetachedFromWindow(@NonNull CommentViewHolder holder) {
-        super.onViewDetachedFromWindow(holder);
-        holder.mediaController.hide();
-    }
-
-
-    @Override
-    public void onViewAttachedToWindow(@NonNull CommentViewHolder holder) {
-        super.onViewAttachedToWindow(holder);
-        holder.mediaController.setAnchorView(holder.videoViewMedia);
-    }
 
     @Override
     public int getItemCount() {
-        return mongometaEntries.size();
+        return mongocommentEntries.size();
     }
 
-    private boolean isVideoFilename(String filename) {
-        return filename.startsWith("video");
-    }
 
 }
 

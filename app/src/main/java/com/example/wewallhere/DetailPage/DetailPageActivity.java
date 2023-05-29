@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -39,26 +39,18 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
-import com.example.wewallhere.DetailPage.DetailPageActivity;
-import com.example.wewallhere.Upload.UploadActivity;
-import com.example.wewallhere.DetailPage.UploadCommentService;
-import com.example.wewallhere.gmaps.SingleLocation;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import Helper.ToastHelper;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -66,14 +58,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import okhttp3.Request;
 
 public class DetailPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private CommentAdapter commentAdapter;
-    private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
+    private List<MongoCommentEntry> mongoCommentList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
-    private String url_download = "http://54.252.196.140:3000/download/";
+    private String url_download = "http://54.252.196.140:3000/downloadComment/";
     private ImageView topimageView;
     private ImageView topTumbnail;
     private VideoView topvideoView;
@@ -104,21 +95,17 @@ public class DetailPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_page);
 
         MongoMediaEntry top_mongoEntry = (MongoMediaEntry) getIntent().getSerializableExtra("MongoMediaEntry");
-        mongoMetaList.clear();
-        mongoMetaList.add(top_mongoEntry);
 
         initTitleBar(top_mongoEntry.getTitle());
         iniTopMedia(top_mongoEntry);
         iniCommentDialog();
 
-//        // Initialize the RecyclerView
-//        recyclerView = findViewById(R.id.recyclerView);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//
-//        // Create and set the adapter for empty mediaList
-//        mediaAdapter = new MediaAdapter(mongoMetaList, url_download, getApplicationContext());
-//        recyclerView.setAdapter(mediaAdapter);
-//        updateMedia();
+        recyclerView = findViewById(R.id.recyclerViewComments);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // Create and set the adapter for empty mediaList
+        commentAdapter = new CommentAdapter(mongoCommentList, url_download, getApplicationContext());
+        recyclerView.setAdapter(commentAdapter);
+        updateComment();
     }
 
     private void iniTopMedia(MongoMediaEntry mongoEntry){
@@ -301,45 +288,43 @@ public class DetailPageActivity extends AppCompatActivity {
 
 
 
-    private void updateMedia() {
+    private void updateComment() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url_media_service)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        updateRecyclerView();
-//        // Create a service interface for your API endpoints
-//        com.example.wewallhere.ExploreByList.MongoMetaService mongoMetaService = retrofit.create(MongoMetaService.class);
-//
-//        // Make an API call to retrieve media files
-//        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList(media_type);  // , "image_1684667427711_388"
-//        call.enqueue(new Callback<List<MongoMediaEntry>>() {
-//            @Override
-//            public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
-//                if (response.isSuccessful()) {
-//                    List<MongoMediaEntry> mediaEntries = response.body();
-//
-//                    // Handle the retrieved media entries
-//                    mongoMetaList.clear();
-//                    mongoMetaList.addAll(mediaEntries);
-//                    updateRecyclerView();
-//
-//                } else {
-//                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<MongoMediaEntry>> call, Throwable t) {
-//                // Handle network or other errors
-//                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
-//            }
-//        });
+        // Create a service interface for your API endpoints
+        MongoCommentService mongoCommentService = retrofit.create(MongoCommentService.class);
+        // Make an API call to retrieve media files
+        Call<List<MongoCommentEntry>> call = mongoCommentService.getCommentMetaList("comment");  // , "image_1684667427711_388"
+        call.enqueue(new Callback<List<MongoCommentEntry>>() {
+            @Override
+            public void onResponse(Call<List<MongoCommentEntry>> call, Response<List<MongoCommentEntry>> response) {
+                if (response.isSuccessful()) {
+                    List<MongoCommentEntry> commentEntries = response.body();
+
+                    // Handle the retrieved media entries
+                    mongoCommentList.clear();
+                    mongoCommentList.addAll(commentEntries);
+                    updateRecyclerView();
+
+                } else {
+                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MongoCommentEntry>> call, Throwable t) {
+                // Handle network or other errors
+                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+            }
+        });
 
     }
 
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
-        commentAdapter = new CommentAdapter(mongoMetaList, url_download);
+        commentAdapter = new CommentAdapter(mongoCommentList, url_download, getApplicationContext());
         recyclerView.setAdapter(commentAdapter);
     }
     private void initTitleBar(String title){
