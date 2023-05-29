@@ -21,7 +21,7 @@ public class MediaViewHolderTop extends RecyclerView.ViewHolder {
     public TextView textViewUploader;
     public TextView textViewDate;
     public RelativeLayout loadingPanel;
-//    public MediaController mediaController;
+    public MediaController mediaController;
 
 
     public MediaViewHolderTop(@NonNull View itemView) {
@@ -34,8 +34,7 @@ public class MediaViewHolderTop extends RecyclerView.ViewHolder {
         videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
         imageViewThumbnail = itemView.findViewById(R.id.imageViewThumbnail);
         loadingPanel = itemView.findViewById(R.id.loadingPanel);
-//        mediaController = new MediaController(itemView.getContext());
-//        videoViewMedia.setMediaController(mediaController);
+        mediaController = new MediaController(itemView.getContext());
 
     }
 
