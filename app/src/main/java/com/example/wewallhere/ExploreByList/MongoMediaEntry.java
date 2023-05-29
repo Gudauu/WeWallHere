@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class MongoMediaEntry implements Serializable {
+    private String ID;
     private String filename;
     private String path;
     private double latitude;
@@ -31,6 +32,10 @@ public class MongoMediaEntry implements Serializable {
         this.content = content;
         this.uploaderName = uploaderName;
         this.comment_count = comment_count;
+    }
+
+    public String getID() {
+        return ID;
     }
 
     public String getFilename() {

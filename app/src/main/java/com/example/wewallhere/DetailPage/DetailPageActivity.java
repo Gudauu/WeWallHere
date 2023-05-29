@@ -39,14 +39,26 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
-import com.example.wewallhere.Upload.ComposeActivity;
+import com.example.wewallhere.DetailPage.DetailPageActivity;
 import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.DetailPage.UploadCommentService;
 import com.example.wewallhere.gmaps.SingleLocation;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import Helper.ToastHelper;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -63,6 +75,7 @@ public class DetailPageActivity extends AppCompatActivity {
     private TextView textTitle;
     private RelativeLayout loadingPanel;
     private ImageView reply;
+    private String topID;
     // Declare the dialog and its views
     private Dialog commentDialog;
     private EditText editTextComment;
@@ -73,6 +86,12 @@ public class DetailPageActivity extends AppCompatActivity {
     private Button buttonCancel;
     private int REQUEST_VIDEO_PICK = 6723;
     private int REQUEST_IMAGE_PICK = 6724;
+    private Uri comment_media_uri;
+    private int TYPE_TEXT = 1;
+    private int TYPE_IMAGE = 2;
+    private int TYPE_VIDEO = 3;
+    private int comment_type = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +128,7 @@ public class DetailPageActivity extends AppCompatActivity {
         topvideoView = findViewById(R.id.videoViewDetail);
         loadingPanel = findViewById(R.id.detailloadingPanel);
         reply = findViewById(R.id.reply);
+        topID = mongoEntry.getID();
         if (isVideoFilename(mongoEntry.getFilename())) {
             String videourl = url_download + "video/" + mongoEntry.getFilename();
             topimageView.setVisibility(View.GONE);
@@ -206,6 +226,8 @@ public class DetailPageActivity extends AppCompatActivity {
     }
 
     private void iniCommentDialog(){
+        comment_type = TYPE_TEXT;
+        comment_media_uri = null;
         commentDialog = new Dialog(this);
         commentDialog.setContentView(R.layout.dialog_comment);
 
@@ -216,17 +238,19 @@ public class DetailPageActivity extends AppCompatActivity {
         buttonSubmit = commentDialog.findViewById(R.id.buttonSubmit);
         buttonCancel = commentDialog.findViewById(R.id.buttonCancel);
 
-        
+
 
         buttonUploadMedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (radioButtonImage.isChecked()) {
-                    // Handle image upload
+                    buttonSubmit.setFocusable(false);
+                    selectImagePermissionCheck();
                 } else if (radioButtonVideo.isChecked()) {
-                    // Handle video upload
+                    buttonSubmit.setFocusable(false);
+                    selectVideoPermissionCheck();
                 } else {
-                    // Show an error message if neither radio button is checked
+                    ToastHelper.showLongToast(getApplicationContext(), "Choose media type.", Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -235,8 +259,19 @@ public class DetailPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String comment = editTextComment.getText().toString();
+                if(comment.length() == 0){
+                    ToastHelper.showLongToast(getApplicationContext(), "Please enter comment.", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if(comment_type == TYPE_TEXT){
+                    uploadTextCommentToServer(topID, "reply", comment);
+                }else if(comment_type == TYPE_IMAGE){
+                    uploadImageCommentToServer(topID, comment_media_uri, "reply", comment);
+                }else if(comment_type == TYPE_VIDEO){
+                    uploadVideoToServer(topID, comment_media_uri, "reply", comment);
+                }
                 // Handle the submission of the comment and selected media
-                commentDialog.dismiss();
+//                commentDialog.dismiss();
             }
         });
 
@@ -315,12 +350,172 @@ public class DetailPageActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
             Uri selectedImageUri = data.getData();
+            comment_type = TYPE_IMAGE;
+            comment_media_uri = selectedImageUri;
+            ToastHelper.showLongToast(getApplicationContext(), "Image selected.", Toast.LENGTH_SHORT);
+            buttonSubmit.setFocusable(true);
 
         } else if (requestCode == REQUEST_VIDEO_PICK && resultCode == RESULT_OK && data != null) {
             Uri selectedVideoUri = data.getData();
-
+            comment_type = TYPE_VIDEO;
+            comment_media_uri = selectedVideoUri;
+            ToastHelper.showLongToast(getApplicationContext(), "Video selected.", Toast.LENGTH_SHORT);
+            buttonSubmit.setFocusable(true);
         }
     }
+
+    private void uploadImageCommentToServer(String replyID, Uri imageUri, String title, String content) {
+        try {
+            // Create a Retrofit instance
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url_media_service) // Replace with your server's IP address
+                    .build();
+
+
+            // Create the request body for image, latitude and longitude
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), getBytesFromInputStream(inputStream));
+            String fileName = "image_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
+            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", fileName, requestBody);
+
+            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneUniqueID()));
+            RequestBody ID_reply = RequestBody.create(MediaType.parse("text/plain"), replyID);
+            RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
+            RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
+
+
+            // Create an instance of the API service interface
+            UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
+
+            // Send the image file to the server
+            Call<ResponseBody> call = UploadCommentService.uploadImage(ID, ID_reply, imagePart, contentTitle, contentBody);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Image uploaded successfully
+                        Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Handle error response
+                        Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
+                        ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Handle network failure
+                    ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                }
+            });
+        } catch (Exception e) {
+            ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed:" + e.getMessage(), Toast.LENGTH_LONG);
+        }
+    }
+    private void uploadTextCommentToServer(String replyID, String title, String content) {
+        try {
+            // Create a Retrofit instance
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url_media_service) // Replace with your server's IP address
+                    .build();
+
+            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneUniqueID()));
+            RequestBody ID_reply = RequestBody.create(MediaType.parse("text/plain"), replyID);
+            RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
+            RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
+
+
+            // Create an instance of the API service interface
+            UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
+
+            // Send the image file to the server
+            Call<ResponseBody> call = UploadCommentService.uploadText(ID, ID_reply, contentTitle, contentBody);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Image uploaded successfully
+                        Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Handle error response
+                        Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
+                        ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Handle network failure
+                    ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                }
+            });
+        } catch (Exception e) {
+            ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed:" + e.getMessage(), Toast.LENGTH_LONG);
+        }
+    }
+    // helper function in video upload
+    private byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        byte[] buffer = new byte[4 * 1024]; // Adjust the buffer size as needed
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, bytesRead);
+        }
+        return byteBuffer.toByteArray();
+    }
+    private void uploadVideoToServer(String replyID, Uri videoUri, String title, String content){
+        try{
+            // Create the Retrofit instance
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url_media_service)
+                    .build();
+
+            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneUniqueID()));
+            RequestBody ID_reply = RequestBody.create(MediaType.parse("text/plain"), replyID);
+
+            // Create the request body for video, latitude and longitude
+            InputStream inputStream = getContentResolver().openInputStream(videoUri);
+            RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), getBytesFromInputStream(inputStream));
+            String fileName = "video_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
+            MultipartBody.Part videoPart = MultipartBody.Part.createFormData("file", fileName, requestBody);
+
+
+            RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
+            RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
+
+
+            // Create the API service interface
+            UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
+
+            // Create the API call to upload the video
+            Call<ResponseBody> call = UploadCommentService.uploadVideo(ID, ID_reply, videoPart,contentTitle, contentBody);
+
+            // Enqueue the API call
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Video uploaded successfully
+                        Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Video upload failed
+                        Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Handle the upload failure
+                    ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed: " + t.getMessage(), Toast.LENGTH_LONG);
+                }
+            });
+        } catch (Exception e){
+            ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed: " + e, Toast.LENGTH_LONG);
+
+        }
+
+    }
+
 
     // media: check permission Select image & video from gallery
     private void selectImagePermissionCheck() {
@@ -358,6 +553,11 @@ public class DetailPageActivity extends AppCompatActivity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("video/*");
         startActivityForResult(intent, REQUEST_VIDEO_PICK);
+    }
+
+    private String geneUniqueID(){
+        String str_ID = System.currentTimeMillis() + "_" + new Random().nextInt(1000) + "_" + new Random().nextInt(1000);
+        return str_ID;
     }
     // media: permission
     private boolean checkVideoPermission() {
