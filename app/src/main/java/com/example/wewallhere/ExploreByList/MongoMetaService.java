@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface MongoMetaService {
-    @GET("mongometa/{type}")
+    @GET("mongometa/media/{type}")
     Call<List<MongoMediaEntry>> getMetaDataList(
             @Path("type") String type
     );
