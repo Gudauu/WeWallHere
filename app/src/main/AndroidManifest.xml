@@ -39,7 +39,7 @@
                 android:value="@integer/google_play_services_version" />
         </activity>
         <activity android:name=".DetailPage.DetailPageActivity" />
-        <activity android:name=".Login.PhoneVerificationActivity" />
+        <activity android:name=".User.PhoneVerificationActivity" />
 
     </application>
 

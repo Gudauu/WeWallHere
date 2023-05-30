@@ -1,6 +1,5 @@
-package com.example.wewallhere.Login;
+package com.example.wewallhere.User;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONObject;
 

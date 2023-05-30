@@ -18,8 +18,10 @@ import androidx.core.content.ContextCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.gmaps.SingleLocation;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.InputStream;
 import java.util.Random;
@@ -52,6 +54,8 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
+        iniBottomMenu();
+
         singleLocation = new SingleLocation(this);
 
         selectImageButton = findViewById(R.id.select_image_button);
@@ -79,7 +83,27 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
 
     }
 
+    private void iniBottomMenu(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.upload);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
 
+            if (itemId == R.id.explore) {
+                startActivity(new Intent(UploadActivity.this, ExploreListActivity.class));
+                return true;
+            } //else if (itemId == R.id.navigation_item2) {
+//                startActivity(new Intent(CurrentActivity.this, Activity2.class));
+//                return true;
+//            } else if (itemId == R.id.navigation_item3) {
+//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
+//                return true;
+//            }
+
+            return false;
+        });
+
+    }
     ////// location
     @Override
     public void onLocationReceived(double latitude, double longitude) {
