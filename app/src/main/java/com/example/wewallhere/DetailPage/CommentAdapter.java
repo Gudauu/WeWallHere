@@ -41,7 +41,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_media_entry, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment_entry, parent, false);
         return new CommentViewHolder(view);
     }
 
@@ -136,6 +136,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
         //        holder.textViewUploader.setText(mongoEntry.getUploaderName());
 
         holder.textViewTitle.setText(mongoEntry.getTitle());
+        holder.textViewContent.setText(mongoEntry.getContent());
         holder.textViewDate.setText(mongoEntry.getTimestamp());
     }
 
