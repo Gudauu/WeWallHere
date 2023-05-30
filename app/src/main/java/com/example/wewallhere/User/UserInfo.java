@@ -8,32 +8,33 @@ import android.widget.TextView;
 import java.io.Serializable;
 
 public class UserInfo implements Serializable {
-    private Uri uri_pfp;
+    private String filename;
     private String username;
     private String phone;
     private String email;
 
 
     public UserInfo() {
-        this.uri_pfp = null;
+        this.filename = null;
         this.username = "PotatoHead";
         this.phone = null;
         this.email = null;
     }
 
-    public UserInfo(Uri uri_pfp, String username, String phone, String email) {
-        this.uri_pfp = uri_pfp;
+    public UserInfo(String filename, String username, String phone, String email) {
+        this.filename = filename;
         this.username = username;
         this.phone = phone;
         this.email = email;
     }
 
-    public Uri getUri_pfp() {
-        return uri_pfp;
+
+    public String getFilename() {
+        return filename;
     }
 
-    public void setUri_pfp(Uri uri_pfp) {
-        this.uri_pfp = uri_pfp;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public String getUsername() {
