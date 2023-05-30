@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -45,12 +46,22 @@ public class PhoneVerificationActivity extends AppCompatActivity {
     private int vcodeLen = 5;
     private Boolean flag_debug = false;   //Shutong
 
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_phone_verify);
+        prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        IniViews();
+        IniViewListeners();
+        IniHandlers();
+    }
+
     private void IniViews(){
         buttonSendVcode = findViewById(R.id.send_vcode);
         buttonVerify = findViewById(R.id.verify);
         inputPhone = findViewById(R.id.input_phone);
         inputVcode = findViewById(R.id.input_vcode);
     }
+
     private void IniViewListeners(){
         buttonSendVcode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,50 +85,35 @@ public class PhoneVerificationActivity extends AppCompatActivity {
                     phone = (inputPhone.getText()).toString();
                 }
                 else if(input_vcode.length() == 0){
-                    Toast.makeText(PhoneVerificationActivity.this, "验证码不能为空！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PhoneVerificationActivity.this, "Please enter verification code", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 else if(vcode == null){
-                    Toast.makeText(PhoneVerificationActivity.this, "请先发送验证码！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PhoneVerificationActivity.this, "Please send the verification code first", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (flag_debug || vcode.equals(input_vcode)){
-                    Toast.makeText(PhoneVerificationActivity.this, "验证成功！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PhoneVerificationActivity.this, "Verified.", Toast.LENGTH_SHORT).show();
 
-                    // not mark as logged in until the info input finishes
-                    // prefs.edit().putBoolean("logged_in",true);
+                    updateSharedPreferences(phone);
 
-
-                    // last step is to put the "phone" in prefs and mark info_notComplete
-
-                    // if local info matches new log in, mark as complete.
-                    if(prefs.contains("info_phone") && (prefs.getString("info_phone","")).equals(phone) && (prefs.getBoolean("logged_in",false))){
-                        prefs.edit().putBoolean("info_notComplete",false).commit();
-                    }
-                    // else, either no local info available or different user. Mark as incomplete.
-                    else{
-                        prefs.edit().putString("info_phone",phone).commit();
-                        prefs.edit().putBoolean("info_notComplete",true).commit();
-                    }
-
-
-
-                    // whatever the current user info status, go to inputactivity where:
-                    // if local info exist and matches new login, show the local info for revision
-                    // if local not exist or mismatch, try fetching from remote. If not exist, input new.
-                    // info will be updated locally and remotely on save. Then log in process finish(logged_in marked true)
                     Intent intent = new Intent();
-                    intent.setClass(PhoneVerificationActivity.this, InputActivity.class);
-
+                    intent.setClass(PhoneVerificationActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
                 else{
                     vcode = null;
-                    Toast.makeText(PhoneVerificationActivity.this, "验证失败，请检查验证码填写或重新发送。", Toast.LENGTH_LONG).show();
+                    Toast.makeText(PhoneVerificationActivity.this, "Verification failed. Please check your code or retry.", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
+    }
+
+    private void updateSharedPreferences(String phoneNumber){
+        long currentTimestamp = System.currentTimeMillis();
+        prefs.edit().putLong("lastLogin", currentTimestamp).commit();
+        prefs.edit().putString("phone", phoneNumber).commit();
     }
     private void IniHandlers(){
         vcodeHandler = new Handler(Looper.getMainLooper()) {
@@ -150,14 +146,6 @@ public class PhoneVerificationActivity extends AppCompatActivity {
         for(int i=0;i<vcodeLen;i++){
             vcode += String.valueOf(new Random().nextInt(10));
         }
-    }
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_phone_verify);
-        prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-        IniViews();
-        IniViewListeners();
-        IniHandlers();
     }
 
 
@@ -206,7 +194,7 @@ class HttpSendVcodeTask extends AsyncTask<Void, Void, Void> {
             // The parameters documented by erkun
             String appKey = "365dabdf62754410bca056d0c13a5d88";
             String mobile = phone;
-            String content = "【WeWallHere】Your verification code: " + vcode;
+            String content = "【蓝钮助手】您的验证码为:" + vcode;
             String timestamp = Long.toString(System.currentTimeMillis());
 
             String appSecret = "546e8267731241f1b66f2ec8f057d719";
@@ -238,7 +226,7 @@ class HttpSendVcodeTask extends AsyncTask<Void, Void, Void> {
 
 
             int code = urlConnection.getResponseCode();
-            if (code !=  201 &&code !=200&&code !=202) {
+            if (code !=  201 && code !=200 && code !=202) {
                 throw new IOException("Invalid response from server: " + code);
             }
             else{
