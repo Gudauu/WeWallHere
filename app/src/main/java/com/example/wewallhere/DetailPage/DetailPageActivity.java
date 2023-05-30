@@ -429,7 +429,7 @@ public class DetailPageActivity extends AppCompatActivity {
             JsonObject data = new JsonObject();
             data.addProperty("ID", geneUniqueID());
             data.addProperty("ID_reply", replyID);
-            data.addProperty("title", replyID);
+            data.addProperty("title", "reply");
             data.addProperty("content", content);
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
