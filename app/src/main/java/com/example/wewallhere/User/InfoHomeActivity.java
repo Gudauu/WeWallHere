@@ -18,6 +18,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.wewallhere.R;
+import com.google.gson.JsonObject;
 
 
 import androidx.annotation.NonNull;
@@ -58,6 +59,7 @@ public class InfoHomeActivity extends AppCompatActivity {
     private Button saveButton;
     private Button logoutButton;
     private UserInfo userInfo;
+    private Uri pfp_uri; // only useful at first selection
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
     private int REQUEST_IMAGE_PICK = 8762;
@@ -100,7 +102,7 @@ public class InfoHomeActivity extends AppCompatActivity {
 
     private void fetchUserInfo(){
         userInfo = new UserInfo();
-        String email = "test@testmail.com";  // when email login is ready, get this from sharedpref
+        String email = "test@mail.com";  // when email login is ready, get this from sharedpref
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url_media_service)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -114,6 +116,16 @@ public class InfoHomeActivity extends AppCompatActivity {
             public void onResponse(retrofit2.Call<UserInfo> call, Response<UserInfo> response) {
                 if (response.isSuccessful()) {
                     UserInfo temp_userInfo = response.body();
+                    userInfo = temp_userInfo;
+                    if(userInfo.getFilename() != null){
+                        LoadPfp(userInfo.getFilename());
+                    }
+                    if(userInfo.getPhone() != null){
+                        phoneEditText.setText(userInfo.getPhone());
+                    }
+                    if(userInfo.getUsername() != null){
+                        usernameEditText.setText(userInfo.getUsername());
+                    }
                     
 
                 } else {
@@ -169,6 +181,7 @@ public class InfoHomeActivity extends AppCompatActivity {
 
     private void saveUserInfo() {
         fetchEditTexts();
+        userInfo.setEmail("test@mail.com");
 
         try {
             // Create a Retrofit instance
@@ -176,41 +189,74 @@ public class InfoHomeActivity extends AppCompatActivity {
                     .baseUrl(url_media_service) // Replace with your server's IP address
                     .build();
 
-            // Create the request body for image, latitude, and longitude
-            InputStream inputStream = getContentResolver().openInputStream(userInfo.getUri_pfp());
-            RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/*"), getBytesFromInputStream(inputStream));
-            String fileName = "pfp_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
-            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", fileName, imageRequestBody);
-
-            // Create the request body for other fields in UserInfo
-            RequestBody usernameRequestBody = RequestBody.create(MediaType.parse("text/plain"), userInfo.getUsername());
-            RequestBody phoneRequestBody = RequestBody.create(MediaType.parse("text/plain"), userInfo.getPhone());
-            RequestBody emailRequestBody = RequestBody.create(MediaType.parse("text/plain"), userInfo.getEmail());
-
             // Create an instance of the API service interface
             UserInfoService uploadService = retrofit.create(UserInfoService.class);
 
-            // Send the image file and other fields to the server
-            retrofit2.Call<ResponseBody> call = uploadService.uploadInfo(imagePart, usernameRequestBody, phoneRequestBody, emailRequestBody);
-            call.enqueue(new retrofit2.Callback<ResponseBody>() {
-                @Override
-                public void onResponse(retrofit2.Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        // Image uploaded successfully
-                        Toast.makeText(InfoHomeActivity.this, "Saved.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Handle error response
-                        Toast.makeText(InfoHomeActivity.this, "Failed to save. Please check your network.", Toast.LENGTH_SHORT).show();
-                        ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
-                    }
-                }
+            // Check if the profile photo URI is not null
+            if (pfp_uri != null) {
+                // Create the request body for other fields in UserInfo
+                RequestBody usernameRequestBody = RequestBody.create(MediaType.parse("text/plain"), userInfo.getUsername());
+                RequestBody phoneRequestBody = RequestBody.create(MediaType.parse("text/plain"), userInfo.getPhone());
+                RequestBody emailRequestBody = RequestBody.create(MediaType.parse("text/plain"), userInfo.getEmail());
 
-                @Override
-                public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
-                    // Handle network failure
-                    ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
-                }
-            });
+                // If profile photo is updated, create the request body for image, latitude, and longitude
+                InputStream inputStream = getContentResolver().openInputStream(pfp_uri);
+                RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/*"), getBytesFromInputStream(inputStream));
+                String fileName = "pfp_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
+                MultipartBody.Part imagePart = MultipartBody.Part.createFormData("file", fileName, imageRequestBody);
+
+                // Send the image file and other fields to the server
+                retrofit2.Call<ResponseBody> call = uploadService.uploadInfo(imagePart, usernameRequestBody, phoneRequestBody, emailRequestBody);
+                call.enqueue(new retrofit2.Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            // Image uploaded successfully
+                            Toast.makeText(InfoHomeActivity.this, "Saved.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Handle error response
+                            Toast.makeText(InfoHomeActivity.this, "Failed to save. Please check your network.", Toast.LENGTH_SHORT).show();
+                            ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
+                        // Handle network failure
+                        ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                    }
+                });
+            } else {
+                // If profile photo is not updated, send only the text fields to the server
+                // Create a JsonObject and add your data
+                JsonObject data = new JsonObject();
+                data.addProperty("username", userInfo.getUsername());
+                data.addProperty("phone", userInfo.getPhone());
+                data.addProperty("email", userInfo.getEmail());
+
+                RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
+
+                retrofit2.Call<Void> call = uploadService.uploadInfoNoImage(requestBody);
+                call.enqueue(new retrofit2.Callback<Void>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            // Data saved successfully
+                            Toast.makeText(InfoHomeActivity.this, "Saved.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Handle error response
+                            Toast.makeText(InfoHomeActivity.this, "Failed to save. Please check your network.", Toast.LENGTH_SHORT).show();
+                            ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                        // Handle network failure
+                        ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                    }
+                });
+            }
         } catch (Exception e) {
             ToastHelper.showLongToast(InfoHomeActivity.this, "Failed to save. Please check your network. " + e.getMessage(), Toast.LENGTH_LONG);
         }
@@ -286,7 +332,7 @@ public class InfoHomeActivity extends AppCompatActivity {
                 Uri selectedImageUri = data.getData();
                 // Call getLocation and then upload the image
                 profileImageView.setImageURI(selectedImageUri);
-                userInfo.setUri_pfp(selectedImageUri);
+                pfp_uri = selectedImageUri;
             } catch (Exception e){
                 ToastHelper.showLongToast(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
             }

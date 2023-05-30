@@ -409,21 +409,8 @@ public class DetailPageActivity extends AppCompatActivity {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url_media_service) // Replace with your server's IP address
                     .build();
-//            RequestBody ID = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(geneUniqueID()));
-//            RequestBody ID_reply = RequestBody.create(MediaType.parse("text/plain"), replyID);
-//            RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
-//            RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
-
-
             // Create an instance of the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
-
-//            // Create a HashMap with your data
-//            HashMap<String, String> data = new HashMap<>();
-//            data.put("ID", geneUniqueID());
-//            data.put("ID_reply", replyID);
-//            data.put("title", title);
-//            data.put("content", content);
 
             // Create a JsonObject and add your data
             JsonObject data = new JsonObject();
