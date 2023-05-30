@@ -5,10 +5,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class UserInfo {
+import java.io.Serializable;
+
+public class UserInfo implements Serializable {
     private Uri uri_pfp;
     private String username;
     private String phone;
+    private String email;
+
+
+    public UserInfo() {
+        this.uri_pfp = null;
+        this.username = "PotatoHead";
+        this.phone = null;
+        this.email = null;
+    }
 
     public UserInfo(Uri uri_pfp, String username, String phone, String email) {
         this.uri_pfp = uri_pfp;
@@ -49,5 +60,4 @@ public class UserInfo {
         this.email = email;
     }
 
-    private String email;
 }
