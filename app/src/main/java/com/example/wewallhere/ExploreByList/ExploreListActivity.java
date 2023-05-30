@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.User.InfoHomeActivity;
 import com.example.wewallhere.gmaps.ExploreMapActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -139,9 +140,10 @@ public class ExploreListActivity extends AppCompatActivity {
             if (itemId == R.id.upload) {
                 startActivity(new Intent(ExploreListActivity.this, UploadActivity.class));
                 return true;
-            } //else if (itemId == R.id.navigation_item2) {
-//                startActivity(new Intent(CurrentActivity.this, Activity2.class));
-//                return true;
+            }  else if (itemId == R.id.info) {
+                startActivity(new Intent(ExploreListActivity.this, InfoHomeActivity.class));
+                return true;
+            }
 //            } else if (itemId == R.id.navigation_item3) {
 //                startActivity(new Intent(CurrentActivity.this, Activity3.class));
 //                return true;
