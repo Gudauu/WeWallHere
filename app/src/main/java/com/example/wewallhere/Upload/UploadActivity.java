@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.User.InfoHomeActivity;
 import com.example.wewallhere.gmaps.SingleLocation;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -92,9 +93,10 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             if (itemId == R.id.explore) {
                 startActivity(new Intent(UploadActivity.this, ExploreListActivity.class));
                 return true;
-            } //else if (itemId == R.id.navigation_item2) {
-//                startActivity(new Intent(CurrentActivity.this, Activity2.class));
-//                return true;
+            } else if (itemId == R.id.info) {
+                startActivity(new Intent(UploadActivity.this, InfoHomeActivity.class));
+                return true;
+            }
 //            } else if (itemId == R.id.navigation_item3) {
 //                startActivity(new Intent(CurrentActivity.this, Activity3.class));
 //                return true;
