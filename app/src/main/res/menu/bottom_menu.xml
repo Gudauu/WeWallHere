@@ -9,10 +9,6 @@
         android:title="upload"
         android:icon="@drawable/common_google_signin_btn_icon_dark"/>
     <item
-        android:id="@+id/history"
-        android:title="history"
-        android:icon="@drawable/common_google_signin_btn_icon_dark"/>
-    <item
         android:id="@+id/info"
         android:title="info"
         android:icon="@drawable/common_google_signin_btn_icon_dark"/>

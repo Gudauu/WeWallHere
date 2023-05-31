@@ -81,13 +81,20 @@
             android:textSize="16sp" />
 
     </LinearLayout>
+    <Button
+        android:id="@+id/history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/phone_layout"
+        android:text="View my posts"
+        android:layout_margin="16dp"/>
 
     <!-- Save Info and Log Out Buttons -->
     <LinearLayout
         android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/phone_layout"
+        android:layout_above="@id/bottom_navigation"
         android:orientation="horizontal"
         android:gravity="end"
         android:padding="16dp">
