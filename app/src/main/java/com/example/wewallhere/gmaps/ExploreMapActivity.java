@@ -126,37 +126,30 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         });
 
 
+        // Set up dropdown menu options for image/video selection
         dropdownMenu = findViewById(R.id.dropdownMenu);
-        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<String>(this, R.layout.item_dropdown_menu, new String[]{});
-        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, new String[]{"image", "video"});
+        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dropdownMenu.setAdapter(dropdownAdapter);
 
         // Set up dropdown menu item selection listener
         dropdownMenu.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedOption = parent.getItemAtPosition(position).toString();
-
-                // Handle the selected option
-                if (selectedOption.equals("image") || selectedOption.equals("video")) {
-                    // Handle image or video selection
-                    if(!selectedOption.equals(media_type)){
-                        media_type = selectedOption;
-                        updateBasedOnCondition();
-                    }
-                } else if (selectedOption.equals("history") && !self_only) {
-                    // Handle history selection
-                    self_only = true;
+                String new_media_type = parent.getItemAtPosition(position).toString();
+                if(!new_media_type.equals(media_type)){
+                    media_type = new_media_type;
                     updateBasedOnCondition();
                 }
-            }
 
+            }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
-        dropdownMenu.setSelection(0); // Set the initial selection to the first item ("image")
+        dropdownMenu.setSelection(0); // Set the initial selection to the first item ("Images")
 
     }
 
