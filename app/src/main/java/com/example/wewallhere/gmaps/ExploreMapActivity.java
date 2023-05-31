@@ -2,6 +2,7 @@ package com.example.wewallhere.gmaps;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.example.wewallhere.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
@@ -55,9 +57,6 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private Marker selectedMarker = null;
-
-
     private TabLayout tabLayout;
     private Toolbar topbar;
     private Spinner dropdownMenu;
@@ -65,6 +64,13 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
     private String url_media_service = "http://54.252.196.140:3000/";
 
     private String media_type = "image";
+    private boolean self_only;
+    private SingleLocation singleLocation;
+    private int REQUEST_SINGLE_LOCATION = 4277;
+    private double latitude = 31;
+    private double longitude = 121;
+    private double ll_delta = 1;
+
 
 
 
@@ -76,6 +82,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         iniBottomMenu();
 
         // Obtain the MapView and initialize it
+        singleLocation = new SingleLocation(this);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
@@ -119,30 +126,37 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         });
 
 
-        // Set up dropdown menu options for image/video selection
         dropdownMenu = findViewById(R.id.dropdownMenu);
-        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, new String[]{"image", "video"});
-        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<String>(this, R.layout.item_dropdown_menu, new String[]{});
+        dropdownAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         dropdownMenu.setAdapter(dropdownAdapter);
 
         // Set up dropdown menu item selection listener
         dropdownMenu.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String new_media_type = parent.getItemAtPosition(position).toString();
-                if(!new_media_type.equals(media_type)){
-                    media_type = new_media_type;
-                    updateMedia();
-                }
+                String selectedOption = parent.getItemAtPosition(position).toString();
 
+                // Handle the selected option
+                if (selectedOption.equals("image") || selectedOption.equals("video")) {
+                    // Handle image or video selection
+                    if(!selectedOption.equals(media_type)){
+                        media_type = selectedOption;
+                        updateBasedOnCondition();
+                    }
+                } else if (selectedOption.equals("history") && !self_only) {
+                    // Handle history selection
+                    self_only = true;
+                    updateBasedOnCondition();
+                }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
-        dropdownMenu.setSelection(0); // Set the initial selection to the first item ("Images")
+        dropdownMenu.setSelection(0); // Set the initial selection to the first item ("image")
 
     }
 
@@ -209,9 +223,105 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         });
 
         // Add markers for media files on the map
-        updateMedia();
+        updateBasedOnCondition();
     }
 
+
+
+    // ll_delta: search in range [latitude +- ll_delta, longitude +- ll_delta]
+    private String geneFilter(){
+        // Create a JSON filter based on your requirements
+        String jsonFilter;
+
+        if(self_only){
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+            String email = prefs.getString("email", getString(R.string.default_email));
+            jsonFilter = "{\"email\": \"" + email + "}";
+        }else {
+            double minLatitude = latitude - ll_delta;
+            double maxLatitude = latitude + ll_delta;
+            double minLongitude = longitude - ll_delta;
+            double maxLongitude = longitude + ll_delta;
+            // Format the latitude and longitude values with 8 decimal places
+            String formattedMinLatitude = String.format("%.8f", minLatitude);
+            String formattedMaxLatitude = String.format("%.8f", maxLatitude);
+            String formattedMinLongitude = String.format("%.8f", minLongitude);
+            String formattedMaxLongitude = String.format("%.8f", maxLongitude);
+
+            // Construct the filter JSON string
+            jsonFilter = String.format("{\"latitude\": {\"$gte\": %s, \"$lte\": %s}, \"longitude\": {\"$gte\": %s, \"$lte\": %s}}",
+                    formattedMinLatitude, formattedMaxLatitude, formattedMinLongitude, formattedMaxLongitude);
+
+        }
+        return jsonFilter;
+
+
+    }
+
+    private void updateBasedOnCondition(){
+        if(!self_only){
+            // need location
+            if (checkSingleLocationPermission()) {
+                // fetch location, then load
+                singleLocation.getLocation(new SingleLocation.LocationCallback() {
+                    @Override
+                    public void onLocationReceived(double la, double lo) {
+                        latitude = la;
+                        longitude = lo;
+                        String filter = geneFilter();
+                        updateMedia(filter);
+                    }
+                });
+            } else {
+                // Request the necessary permissions
+                String[] permissions = new String[]{
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                };
+                ActivityCompat.requestPermissions(this, permissions, REQUEST_SINGLE_LOCATION);
+            }
+
+        }else{ // location doesn't matter
+            String filter = geneFilter();
+            updateMedia(filter);
+        }
+    }
+
+    private void updateMedia(String filter) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url_media_service)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        // Create a service interface for your API endpoints
+        MongoMetaService mongoMetaService = retrofit.create(MongoMetaService.class);
+
+        // Make an API call to retrieve media files
+        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList(media_type, filter);  // , "image_1684667427711_388"
+        call.enqueue(new Callback<List<MongoMediaEntry>>() {
+            @Override
+            public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
+                if (response.isSuccessful()) {
+                    List<MongoMediaEntry> mediaEntries = response.body();
+
+                    // Handle the retrieved media entries
+                    mongoMetaList.clear();
+                    mongoMetaList.addAll(mediaEntries);
+                    updateMediaMarkers();
+
+                } else {
+                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MongoMediaEntry>> call, Throwable t) {
+                // Handle network or other errors
+                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+            }
+        });
+
+    }
 
     private void updateMediaMarkers() {
         // Retrieve the list of media files with their latitude and longitude
@@ -268,40 +378,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         });
     }
 
-    private void updateMedia() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url_media_service)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        // Create a service interface for your API endpoints
-        MongoMetaService mongoMetaService = retrofit.create(MongoMetaService.class);
-
-        // Make an API call to retrieve media files
-        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList(media_type);  // , "image_1684667427711_388"
-        call.enqueue(new Callback<List<MongoMediaEntry>>() {
-            @Override
-            public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
-                if (response.isSuccessful()) {
-                    List<MongoMediaEntry> mediaEntries = response.body();
-                    // Handle the retrieved media entries
-                    mongoMetaList.clear();
-                    mongoMetaList.addAll(mediaEntries);
-                    updateMediaMarkers();
-
-                } else {
-                    ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<MongoMediaEntry>> call, Throwable t) {
-                // Handle network or other errors
-                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
-            }
-        });
-
-    }
 
 
     private boolean checkSingleLocationPermission(){
