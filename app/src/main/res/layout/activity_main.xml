@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".Main.MainActivity">
 
+    <TextView
+        android:id="@+id/user_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello world"
+        app:layout_constraintBottom_toTopOf="@+id/go_to_upload_section"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/go_to_upload_section"
         android:layout_width="wrap_content"
