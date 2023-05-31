@@ -157,6 +157,9 @@ public class InfoHomeActivity extends AppCompatActivity {
                     if(userInfo.getPhone() != null){
                         phoneEditText.setText(userInfo.getPhone());
                     }
+                    if(userInfo.getUsername() != null){
+                        usernameEditText.setText(userInfo.getUsername());
+                    }
                 } else {
                     ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
                 }
