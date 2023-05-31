@@ -20,6 +20,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.Upload.ComposeActivity;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.JsonObject;
@@ -59,6 +60,7 @@ public class InfoHomeActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText phoneEditText;
     private TextView emailTextView;
+    private Button historyButton;
     private Button saveButton;
     private Button logoutButton;
     private UserInfo userInfo;
@@ -78,6 +80,7 @@ public class InfoHomeActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.username);
         phoneEditText = findViewById(R.id.phone);
         emailTextView = findViewById(R.id.email);
+        historyButton = findViewById(R.id.history);
         saveButton = findViewById(R.id.save_info_button);
         logoutButton = findViewById(R.id.log_out_button);
 
@@ -91,6 +94,14 @@ public class InfoHomeActivity extends AppCompatActivity {
             }
         });
 
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(InfoHomeActivity.this, ExploreListActivity.class);
+                intent.putExtra("self_only", true); // Replace true with the actual boolean value
+                startActivity(intent);
+            }
+        });
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

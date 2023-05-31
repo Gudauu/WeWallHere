@@ -78,6 +78,10 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explore_maps);
+
+        Intent intent = getIntent();
+        self_only = intent.getBooleanExtra("self_only", false);
+
         initTopBar();
         iniBottomMenu();
 
@@ -99,6 +103,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
         tabLayout.addTab(listViewTab);
         tabLayout.addTab(mapViewTab);
+
         mapViewTab.select();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -108,6 +113,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 if (position == 0) {
                     // Handle the click on the "List View" tab
                     Intent listIntent = new Intent(ExploreMapActivity.this, ExploreListActivity.class);
+                    listIntent.putExtra("self_only", self_only);
                     startActivity(listIntent);
                 } else if (position == 1) {
                     // do nothing
@@ -155,7 +161,13 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private void iniBottomMenu(){
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.explore);
+        // if is viewing history, stay in "info" section
+        if(!self_only) {
+            bottomNavigationView.setSelectedItemId(R.id.explore);
+        }else{
+            bottomNavigationView.setSelectedItemId(R.id.info);
+
+        }
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
@@ -164,6 +176,9 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 return true;
             }  else if (itemId == R.id.info) {
                 startActivity(new Intent(ExploreMapActivity.this, InfoHomeActivity.class));
+                return true;
+            }  else if (itemId == R.id.explore && self_only) {  // it's viewing history in info tag actually.
+                startActivity(new Intent(ExploreMapActivity.this, ExploreListActivity.class));
                 return true;
             }
 //            } else if (itemId == R.id.navigation_item3) {
