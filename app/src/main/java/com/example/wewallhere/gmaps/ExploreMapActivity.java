@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wewallhere.DetailPage.DetailPageActivity;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMetaService;
 import com.example.wewallhere.Main.MainActivity;
@@ -32,6 +35,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -51,6 +55,8 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private GoogleMap googleMap;
     private MapView mapView;
+    private Marker selectedMarker = null;
+
 
     private TabLayout tabLayout;
     private Toolbar topbar;
@@ -217,8 +223,49 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                     .position(position)
                     .title(media.getTitle())
                     .snippet(media.getUploaderName());
-            googleMap.addMarker(markerOptions);
+            Marker marker = googleMap.addMarker(markerOptions);
+            marker.setTag(media); // Set the media entry as the tag of the marker
         }
+
+        // Set a custom info window adapter for the markers
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null; // Return null to use the default info window layout
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                // Inflate a custom info window layout
+                View infoWindow = getLayoutInflater().inflate(R.layout.item_map_marker_info, null);
+
+                // Find the views within the custom info window layout
+                TextView titleTextView = infoWindow.findViewById(R.id.titleTextView);
+                TextView uploaderTextView = infoWindow.findViewById(R.id.uploaderTextView);
+
+                // Retrieve the media entry from the marker's tag
+                MongoMediaEntry media = (MongoMediaEntry) marker.getTag();
+
+                // Set the title and uploader name in the custom info window layout
+                titleTextView.setText(media.getTitle());
+                uploaderTextView.setText(media.getUploaderName());
+
+                return infoWindow;
+            }
+        });
+
+        // Set an info window click listener for the markers
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Retrieve the media entry from the marker's tag
+                MongoMediaEntry media = (MongoMediaEntry) marker.getTag();
+                Intent intent = new Intent(ExploreMapActivity.this, DetailPageActivity.class);
+                // Pass the selected media entry as an extra to the new activity
+                intent.putExtra("MongoMediaEntry", media);
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateMedia() {
