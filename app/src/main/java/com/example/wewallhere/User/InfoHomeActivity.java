@@ -18,7 +18,10 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.Upload.UploadActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.JsonObject;
 
 
@@ -68,6 +71,8 @@ public class InfoHomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_home);
+        iniBottomMenu();
+
 
         profileImageView = findViewById(R.id.profile_picture);
         usernameEditText = findViewById(R.id.username);
@@ -99,6 +104,30 @@ public class InfoHomeActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    private void iniBottomMenu(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.info);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.upload) {
+                startActivity(new Intent(InfoHomeActivity.this, UploadActivity.class));
+                return true;
+            }  else if (itemId == R.id.explore) {
+                startActivity(new Intent(InfoHomeActivity.this, ExploreListActivity.class));
+                return true;
+            }
+//            } else if (itemId == R.id.navigation_item3) {
+//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
+//                return true;
+//            }
+
+            return false;
+        });
+
+    }
+
 
     private void fetchUserInfo(){
         SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
