@@ -64,7 +64,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
     private String url_media_service = "http://54.252.196.140:3000/";
 
     private String media_type = "image";
-    private boolean self_only;
+    private boolean self_only = false;
     private SingleLocation singleLocation;
     private int REQUEST_SINGLE_LOCATION = 4277;
     private double latitude = 31;
@@ -229,7 +229,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         if(self_only){
             SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
             String email = prefs.getString("email", getString(R.string.default_email));
-            jsonFilter = "{\"email\": \"" + email + "}";
+            jsonFilter = "{\"email\": \"" + email + "\"}";
         }else {
             double minLatitude = latitude - ll_delta;
             double maxLatitude = latitude + ll_delta;

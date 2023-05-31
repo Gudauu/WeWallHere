@@ -182,7 +182,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
         if(self_only){
             SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
             String email = prefs.getString("email", getString(R.string.default_email));
-            jsonFilter = "{\"email\": \"" + email + "}";
+            jsonFilter = "{\"email\": \"" + email + "\"}";
         }else {
                 double minLatitude = latitude - ll_delta;
                 double maxLatitude = latitude + ll_delta;
