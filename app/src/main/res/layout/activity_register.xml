@@ -42,6 +42,11 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <ProgressBar
+        android:id="@+id/register_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
     <Button
         android:id="@+id/register_btn"
         android:text="@string/register"
