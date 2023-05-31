@@ -3,6 +3,7 @@ package com.example.wewallhere.DetailPage;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -111,8 +112,8 @@ public class DetailPageActivity extends AppCompatActivity {
     private void iniTopMedia(MongoMediaEntry mongoEntry){
         TextView content = findViewById(R.id.textViewContentDetail);
         content.setText(mongoEntry.getContent());
-//        TextView author = findViewById(R.id.textViewUploaderDetail);
-//        author.setText(uploader);
+        TextView author = findViewById(R.id.textViewUploaderDetail);
+        author.setText(mongoEntry.getUploaderName());
         TextView time = findViewById(R.id.textViewDateDetail);
         time.setText(mongoEntry.getTimestamp());
         // load media
@@ -374,12 +375,16 @@ public class DetailPageActivity extends AppCompatActivity {
             RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
 
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
+
 
             // Create an instance of the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
 
             // Send the image file to the server
-            Call<ResponseBody> call = UploadCommentService.uploadImage(ID, ID_reply, imagePart, contentTitle, contentBody);
+            Call<ResponseBody> call = UploadCommentService.uploadImage(ID, ID_reply, imagePart, contentTitle, contentBody, usernameBody, emailBody);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -412,12 +417,15 @@ public class DetailPageActivity extends AppCompatActivity {
             // Create an instance of the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
 
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
             // Create a JsonObject and add your data
             JsonObject data = new JsonObject();
             data.addProperty("ID", geneUniqueID());
             data.addProperty("ID_reply", replyID);
             data.addProperty("title", "reply");
             data.addProperty("content", content);
+            data.addProperty("username", prefs.getString("username", getString(R.string.default_usename)));
+            data.addProperty("email", prefs.getString("email", getString(R.string.default_email)));
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
 
@@ -475,13 +483,16 @@ public class DetailPageActivity extends AppCompatActivity {
 
             RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
 
 
             // Create the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
 
             // Create the API call to upload the video
-            Call<ResponseBody> call = UploadCommentService.uploadVideo(ID, ID_reply, videoPart,contentTitle, contentBody);
+            Call<ResponseBody> call = UploadCommentService.uploadVideo(ID, ID_reply, videoPart,contentTitle, contentBody, usernameBody, emailBody);
 
             // Enqueue the API call
             call.enqueue(new Callback<ResponseBody>() {

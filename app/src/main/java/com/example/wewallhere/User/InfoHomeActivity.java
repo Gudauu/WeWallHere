@@ -2,6 +2,7 @@ package com.example.wewallhere.User;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -51,7 +52,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InfoHomeActivity extends AppCompatActivity {
-
     private ImageView profileImageView;
     private EditText usernameEditText;
     private EditText phoneEditText;
@@ -101,8 +101,13 @@ public class InfoHomeActivity extends AppCompatActivity {
     }
 
     private void fetchUserInfo(){
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
         userInfo = new UserInfo();
-        String email = "test@mail.com";  // when email login is ready, get this from sharedpref
+        userInfo.setEmail(prefs.getString("email", getString(R.string.default_email)));
+        userInfo.setUsername(prefs.getString("username", getString(R.string.default_usename)));
+        emailTextView.setText(prefs.getString("email", "test@mail.com"));
+        usernameEditText.setText(prefs.getString("username", getString(R.string.default_usename)));
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url_media_service)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -110,7 +115,7 @@ public class InfoHomeActivity extends AppCompatActivity {
         // Create a service interface for your API endpoints
         UserInfoService userInfoService = retrofit.create(UserInfoService.class);
         // Make an API call to retrieve media files
-        retrofit2.Call<UserInfo> call = userInfoService.getUserInfo(email); 
+        retrofit2.Call<UserInfo> call = userInfoService.getUserInfo(userInfo.getEmail());
         call.enqueue(new Callback<UserInfo>() {
             @Override
             public void onResponse(retrofit2.Call<UserInfo> call, Response<UserInfo> response) {
@@ -123,11 +128,6 @@ public class InfoHomeActivity extends AppCompatActivity {
                     if(userInfo.getPhone() != null){
                         phoneEditText.setText(userInfo.getPhone());
                     }
-                    if(userInfo.getUsername() != null){
-                        usernameEditText.setText(userInfo.getUsername());
-                    }
-                    
-
                 } else {
                     ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
                 }
@@ -136,7 +136,8 @@ public class InfoHomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<UserInfo> call, Throwable t) {
                 // Handle network or other errors
-                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                // Shutong: new user will also get nothing
+//                ToastHelper.showLongToast(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
             }
         });
 //        userInfo.setEmail("test@mail.com");
@@ -181,7 +182,9 @@ public class InfoHomeActivity extends AppCompatActivity {
 
     private void saveUserInfo() {
         fetchEditTexts();
-        userInfo.setEmail("test@mail.com");
+        // save username to sharedpreferences
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        prefs.edit().putString("username",userInfo.getUsername()).commit();
 
         try {
             // Create a Retrofit instance
