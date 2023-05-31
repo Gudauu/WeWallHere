@@ -1,6 +1,7 @@
 package com.example.wewallhere.Upload;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -29,7 +30,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class ComposeActivity extends AppCompatActivity {
-
     private EditText editTextTitle;
     private EditText editTextContent;
     private Button buttonUpload;
@@ -106,12 +106,16 @@ public class ComposeActivity extends AppCompatActivity {
             RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), title);
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
 
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
+
 
             // Create an instance of the API service interface
             UploadService uploadService = retrofit.create(UploadService.class);
 
             // Send the image file to the server
-            Call<ResponseBody> call = uploadService.uploadImage(ID, imagePart, latitudeBody, longitudeBody,titleBody, contentBody);
+            Call<ResponseBody> call = uploadService.uploadImage(ID, imagePart, latitudeBody, longitudeBody,titleBody, contentBody, usernameBody, emailBody);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -167,13 +171,16 @@ public class ComposeActivity extends AppCompatActivity {
 
             RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), title);
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
 
 
             // Create the API service interface
             UploadService uploadService = retrofit.create(UploadService.class);
 
             // Create the API call to upload the video
-            Call<ResponseBody> call = uploadService.uploadVideo(ID, videoPart, latitudeBody, longitudeBody,titleBody, contentBody);
+            Call<ResponseBody> call = uploadService.uploadVideo(ID, videoPart, latitudeBody, longitudeBody,titleBody, contentBody, usernameBody, emailBody);
 
             // Enqueue the API call
             call.enqueue(new Callback<ResponseBody>() {

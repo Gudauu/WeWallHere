@@ -15,13 +15,16 @@ public class MongoCommentEntry implements Serializable {
     private String timestamp;
     private String title;
     private String content;
-    private String uploaderName;
+    private String username;
+    private String email;
     private int comment_count;
 
 
+
+
     public MongoCommentEntry(String ID, String ID_reply, String filename, String path, String type,
-                           String timestamp,String title, String content, String uploaderName,
-                           int comment_count) {
+                             String timestamp, String title, String content, String uploaderName, String email,
+                             int comment_count) {
         this.ID = ID;
         this.type = type;
         this.ID_reply = ID_reply;
@@ -30,10 +33,18 @@ public class MongoCommentEntry implements Serializable {
         this.timestamp = timestamp;
         this.title = title;
         this.content = content;
-        this.uploaderName = uploaderName;
+        this.username = uploaderName;
+        this.email = email;
         this.comment_count = comment_count;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
     public String getID() {
         return ID;
     }
@@ -78,6 +89,6 @@ public class MongoCommentEntry implements Serializable {
     }
 
     public String getUploaderName() {
-        return uploaderName;
+        return username;
     }
 }

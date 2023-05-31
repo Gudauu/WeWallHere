@@ -31,19 +31,27 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Check if the user has logged in before
-        boolean isLoggedIn = checkLoggedIn();
 
-        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
-        if (!isLoggedIn) {
-            startActivity(new Intent(MainActivity.this, PhoneVerificationActivity.class));
-            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
+//        // Check if the user has logged in before
+//        boolean isLoggedIn = checkLoggedIn();
+//
+//        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
+//        if (!isLoggedIn) {
+//            startActivity(new Intent(MainActivity.this, PhoneVerificationActivity.class));
+//            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
+//        }
+
+        //Shutong: give a fake email for now
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        if(!prefs.contains("email")){
+            prefs.edit().putString("email", getString(R.string.default_email)).commit();
+            prefs.edit().putString("username", getString(R.string.default_usename)).commit();
         }
-
         // Continue with rendering the MainActivity page
         setContentView(R.layout.activity_main);
 

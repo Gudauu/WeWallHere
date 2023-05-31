@@ -133,8 +133,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
         }
 
         //        holder.imageViewProfilePic.setImageResource(mongoEntry.getProfilePicResId());
-        //        holder.textViewUploader.setText(mongoEntry.getUploaderName());
-
+        holder.textViewUploader.setText(mongoEntry.getUploaderName());
         holder.textViewTitle.setText(mongoEntry.getTitle());
         holder.textViewContent.setText(mongoEntry.getContent());
         holder.textViewDate.setText(mongoEntry.getTimestamp());

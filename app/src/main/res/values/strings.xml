@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WeWallHere</string>
+    <string name="default_usename">PotatoHead</string>
+    <string name="default_email">potato_test@mail.com</string>
 </resources>

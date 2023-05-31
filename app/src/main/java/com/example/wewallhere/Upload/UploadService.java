@@ -17,7 +17,9 @@ public interface UploadService {
             @Part("latitude") RequestBody latitude,
             @Part("longitude") RequestBody longitude,
             @Part("title") RequestBody title,
-            @Part("content") RequestBody content
+            @Part("content") RequestBody content,
+            @Part("username") RequestBody username,
+            @Part("email") RequestBody email
     );
 
     @Multipart
@@ -28,7 +30,9 @@ public interface UploadService {
             @Part("latitude") RequestBody latitude,
             @Part("longitude") RequestBody longitude,
             @Part("title") RequestBody title,
-            @Part("content") RequestBody content
+            @Part("content") RequestBody content,
+            @Part("username") RequestBody username,
+            @Part("email") RequestBody email
     );
 }
 

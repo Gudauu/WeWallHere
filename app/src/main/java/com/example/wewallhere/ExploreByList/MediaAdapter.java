@@ -66,14 +66,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             holder.imageViewMedia.setVisibility(View.GONE);
             holder.videoViewMedia.setVisibility(View.VISIBLE);
 
-
-
-
             // Set the video URI
             Uri videoUri = Uri.parse(videourl);
             holder.videoViewMedia.setVideoURI(videoUri);
 //            holder.videoViewMedia.seekTo( 1 );
-
 
             // using glide to render video thumbnail
             Glide.with(holder.itemView.getContext())
@@ -93,17 +89,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
                             super.onLoadFailed(errorDrawable);
                         }
                     });
-
-
-//            MediaController mediaController = new MediaController(holder.itemView.getContext());
-//            mediaController.setAnchorView(holder.videoViewMedia);
-//            mediaController.setMediaPlayer(holder.videoViewMedia);
-//            MediaController finalMediaController = mediaController;
-            // Set the MediaController for the VideoView
-//            holder.videoViewMedia.setMediaController(holder.mediaController);
-
-            // Update the MediaController's anchor view
-//            updateMediaController(holder.mediaController, holder.videoViewMedia);
 
             final boolean[] ready = {false};
             holder.videoViewMedia.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -162,8 +147,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaViewHolder> {
         }
 
 //        holder.imageViewProfilePic.setImageResource(mongoEntry.getProfilePicResId());
-        //        holder.textViewUploader.setText(mongoEntry.getUploaderName());
-
+        holder.textViewUploader.setText(mongoEntry.getUploaderName());
         holder.textViewTitle.setText(mongoEntry.getTitle());
         holder.textViewDate.setText(mongoEntry.getTimestamp());
         holder.details.setOnClickListener(new View.OnClickListener() {

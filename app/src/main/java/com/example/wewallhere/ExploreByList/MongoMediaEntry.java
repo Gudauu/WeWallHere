@@ -16,12 +16,13 @@ public class MongoMediaEntry implements Serializable {
     private String timestamp;
     private String title;
     private String content;
-    private String uploaderName;
+    private String username;
+    private String email;
     private int comment_count;
 
 
     public MongoMediaEntry(String filename, String path, double latitude, double longitude,
-                           String timestamp,String title, String content, String uploaderName,
+                           String timestamp,String title, String content, String uploaderName, String uploaderEmail,
                            int comment_count) {
         this.filename = filename;
         this.path = path;
@@ -30,7 +31,8 @@ public class MongoMediaEntry implements Serializable {
         this.timestamp = timestamp;
         this.title = title;
         this.content = content;
-        this.uploaderName = uploaderName;
+        this.username = uploaderName;
+        this.email = uploaderEmail;
         this.comment_count = comment_count;
     }
 
@@ -53,6 +55,11 @@ public class MongoMediaEntry implements Serializable {
     public double getLongitude() {
         return longitude;
     }
+
+    public String getUploaderEmail() {
+        return email;
+    }
+
 
     public String getTimestamp() {
         // Define the input and output date formats
@@ -80,7 +87,7 @@ public class MongoMediaEntry implements Serializable {
     }
 
     public String getUploaderName() {
-        return uploaderName;
+        return username;
     }
 }
 

@@ -20,7 +20,9 @@ public interface UploadCommentService {
             @Part("ID_reply") RequestBody ID_reply,
             @Part MultipartBody.Part image,
             @Part("title") RequestBody title,
-            @Part("content") RequestBody content
+            @Part("content") RequestBody content,
+            @Part("username") RequestBody username,
+            @Part("email") RequestBody email
     );
 
     @Multipart
@@ -30,7 +32,9 @@ public interface UploadCommentService {
             @Part("ID_reply") RequestBody ID_reply,
             @Part MultipartBody.Part video,
             @Part("title") RequestBody title,
-            @Part("content") RequestBody content
+            @Part("content") RequestBody content,
+            @Part("username") RequestBody username,
+            @Part("email") RequestBody email
     );
 
     @Headers("Content-Type: application/json")
