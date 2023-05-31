@@ -1,6 +1,5 @@
 package com.example.wewallhere.Main;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -15,6 +14,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.example.wewallhere.User.EmailVerificationActivity;
 import com.example.wewallhere.User.PhoneVerificationActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.UploadActivity;
@@ -31,20 +31,21 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
     };
+    private boolean DEBUG = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
-//        // Check if the user has logged in before
-//        boolean isLoggedIn = checkLoggedIn();
-//
-//        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
-//        if (!isLoggedIn) {
-//            startActivity(new Intent(MainActivity.this, PhoneVerificationActivity.class));
-//            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
-//        }
+        // Check if the user has logged in before
+        boolean isLoggedIn = checkLoggedIn();
+
+        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
+        if (!isLoggedIn || DEBUG) {
+            startActivity(new Intent(MainActivity.this, EmailVerificationActivity.class));
+            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
+        }
 
         //Shutong: give a fake email for now
         SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_EXPLORE_ACTIVITY) {
             // Check if all required permissions are granted, including media & location
