@@ -204,34 +204,40 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         }
         // Enable the "My Location" button
         googleMap.setMyLocationEnabled(true);
+        centerAroundMe();
+
 
         // Set a click listener on the "My Location" button to center the map
         googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-                // Center the map around the user's current location
-                if (ContextCompat.checkSelfPermission(ExploreMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    // Get the user's current location
-                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(ExploreMapActivity.this);
-                    fusedLocationClient.getLastLocation()
-                            .addOnSuccessListener(new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(Location location) {
-                                    if (location != null) {
-                                        // Center the map on the user's location
-                                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f);
-                                        googleMap.animateCamera(cameraUpdate);
-                                    }
-                                }
-                            });
-                }
+                centerAroundMe();
                 return true;
             }
         });
 
         // Add markers for media files on the map
         updateBasedOnCondition();
+    }
+
+    private void centerAroundMe(){
+        // Center the map around the user's current location
+        if (ContextCompat.checkSelfPermission(ExploreMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // Get the user's current location
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(ExploreMapActivity.this);
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                // Center the map on the user's location
+                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f);
+                                googleMap.animateCamera(cameraUpdate);
+                            }
+                        }
+                    });
+        }
     }
 
 
