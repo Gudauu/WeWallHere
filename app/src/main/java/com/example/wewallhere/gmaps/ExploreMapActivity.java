@@ -22,6 +22,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
+import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.User.InfoHomeActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -32,6 +34,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -64,6 +67,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explore_maps);
         initTopBar();
+        iniBottomMenu();
 
         // Obtain the MapView and initialize it
         mapView = findViewById(R.id.mapView);
@@ -136,6 +140,28 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
     }
 
+    private void iniBottomMenu(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.explore);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.upload) {
+                startActivity(new Intent(ExploreMapActivity.this, UploadActivity.class));
+                return true;
+            }  else if (itemId == R.id.info) {
+                startActivity(new Intent(ExploreMapActivity.this, InfoHomeActivity.class));
+                return true;
+            }
+//            } else if (itemId == R.id.navigation_item3) {
+//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
+//                return true;
+//            }
+
+            return false;
+        });
+
+    }
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
