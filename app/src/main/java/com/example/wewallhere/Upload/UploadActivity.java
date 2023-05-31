@@ -74,13 +74,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
             }
         });
 
-//        testSingleLocationButton = findViewById(R.id.fetch_single_location);
-//        testSingleLocationButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                fetchSingleLocation();
-//            }
-//        });
+
 
     }
 
