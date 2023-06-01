@@ -40,10 +40,7 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
-import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
-import com.example.wewallhere.Upload.ComposeActivity;
-import com.example.wewallhere.Upload.UploadActivity;
 import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;

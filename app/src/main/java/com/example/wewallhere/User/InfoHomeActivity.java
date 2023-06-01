@@ -337,6 +337,7 @@ public class InfoHomeActivity extends AppCompatActivity {
         // Intent intent = new Intent(this, PhoneVerificationActivity.class);
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+
         startActivity(intent);
         finish(); // Optional: Finish the current activity to prevent the user from coming back here after logging out
     }

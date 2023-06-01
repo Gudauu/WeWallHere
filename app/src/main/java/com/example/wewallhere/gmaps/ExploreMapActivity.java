@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.example.wewallhere.DetailPage.DetailPageActivity;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMetaService;
-import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 
 
@@ -198,7 +196,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         if (!checkSingleLocationPermission()) {
             ToastHelper.showLongToast(getApplicationContext(), "No location permission.", Toast.LENGTH_SHORT);
             Intent intent = new Intent();
-            intent.setClass(ExploreMapActivity.this, MainActivity.class);
+            intent.setClass(ExploreMapActivity.this, ExploreListActivity.class);
             startActivity(intent);
             return;
         }
@@ -403,14 +401,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 coarse_location == PackageManager.PERMISSION_GRANTED;
     }
 
-    // go to main page when scrolling back
-    @Override
-    public void onBackPressed() {
-        // Start the main activity or perform any other navigation action
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
-        startActivity(intent);
-    }
+
 
     @Override
     protected void onResume() {

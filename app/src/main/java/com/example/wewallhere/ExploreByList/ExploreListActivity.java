@@ -19,9 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
-import com.example.wewallhere.Upload.ComposeActivity;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.example.wewallhere.User.InfoHomeActivity;
 import com.example.wewallhere.gmaps.ExploreMapActivity;
@@ -30,10 +28,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import Helper.ToastHelper;
 import retrofit2.Call;
@@ -300,14 +296,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
     }
 
 
-    // go to main page when scrolling back
-    @Override
-    public void onBackPressed() {
-        // Start the main activity or perform any other navigation action
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
-        startActivity(intent);
-    }
+
 
 
     private boolean checkSingleLocationPermission(){

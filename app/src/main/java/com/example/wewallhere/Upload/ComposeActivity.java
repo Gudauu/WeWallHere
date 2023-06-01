@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 
 
