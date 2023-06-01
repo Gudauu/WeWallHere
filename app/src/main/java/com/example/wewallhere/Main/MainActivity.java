@@ -12,24 +12,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-<<<<<<< HEAD
 import android.widget.TextView;
-=======
 import android.widget.Toast;
 import android.widget.VideoView;
->>>>>>> main
 
 import com.example.wewallhere.User.EmailVeriActivity;
 import com.example.wewallhere.User.PhoneVerificationActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.UploadActivity;
-<<<<<<< HEAD
 import com.example.wewallhere.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-=======
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
->>>>>>> main
+
 
 public class MainActivity extends AppCompatActivity {
     FirebaseAuth auth;
