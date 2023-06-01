@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.wewallhere.R;
@@ -115,10 +116,12 @@ public class ComposeActivity extends AppCompatActivity {
             UploadService uploadService = retrofit.create(UploadService.class);
 
             // Send the image file to the server
+            toggleFreezeAndLoad(true);
             Call<ResponseBody> call = uploadService.uploadImage(ID, imagePart, latitudeBody, longitudeBody,titleBody, contentBody, usernameBody, emailBody);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    toggleFreezeAndLoad(false);
                     if (response.isSuccessful()) {
                         // Image uploaded successfully
                         Toast.makeText(ComposeActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
@@ -132,10 +135,12 @@ public class ComposeActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
                     // Handle network failure
+                    toggleFreezeAndLoad(false);
                     ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e) {
+            toggleFreezeAndLoad(false);
             ToastHelper.showLongToast(ComposeActivity.this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_LONG);
         }
     }
@@ -179,6 +184,7 @@ public class ComposeActivity extends AppCompatActivity {
             // Create the API service interface
             UploadService uploadService = retrofit.create(UploadService.class);
 
+            toggleFreezeAndLoad(true);
             // Create the API call to upload the video
             Call<ResponseBody> call = uploadService.uploadVideo(ID, videoPart, latitudeBody, longitudeBody,titleBody, contentBody, usernameBody, emailBody);
 
@@ -186,6 +192,7 @@ public class ComposeActivity extends AppCompatActivity {
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    toggleFreezeAndLoad(false);
                     if (response.isSuccessful()) {
                         // Video uploaded successfully
                         Toast.makeText(ComposeActivity.this, "Video uploaded successfully", Toast.LENGTH_SHORT).show();
@@ -198,10 +205,12 @@ public class ComposeActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
                     // Handle the upload failure
+                    toggleFreezeAndLoad(false);
                     ToastHelper.showLongToast(ComposeActivity.this, "Video upload failed: " + t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e){
+            toggleFreezeAndLoad(false);
             ToastHelper.showLongToast(ComposeActivity.this, "Video upload failed:" + e, Toast.LENGTH_LONG);
 
         }
@@ -211,6 +220,20 @@ public class ComposeActivity extends AppCompatActivity {
     private String geneuniqueID(){
         return System.currentTimeMillis() + "_" + new Random().nextInt(1000) + "_" + new Random().nextInt(1000);
     }
+
+    private void toggleFreezeAndLoad(boolean start) {
+        RelativeLayout loadingPanel = findViewById(R.id.loadingPanel);
+        Button buttonUpload = findViewById(R.id.buttonUpload);
+
+        if (start) {
+            loadingPanel.setVisibility(View.VISIBLE);
+            buttonUpload.setEnabled(false); // Disable the button
+        } else {
+            loadingPanel.setVisibility(View.GONE);
+            buttonUpload.setEnabled(true); // Enable the button
+        }
+    }
+
 
 }
 

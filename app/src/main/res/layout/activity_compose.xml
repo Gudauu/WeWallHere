@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     tools:context=".Upload.UploadActivity">
 
     <TextView
@@ -15,7 +13,9 @@
         android:text="Fill out your thoughts..."
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="30dp" />
 
     <TextView
         android:id="@+id/textViewTitle"
@@ -24,13 +24,15 @@
         android:text="Title"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_below="@id/textViewHeadTitle" />
 
     <EditText
         android:id="@+id/editTextTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter a title" />
+        android:hint="Enter a title"
+        android:layout_below="@id/textViewTitle" />
 
     <TextView
         android:id="@+id/textViewContent"
@@ -40,7 +42,8 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_below="@id/editTextTitle" />
 
     <EditText
         android:id="@+id/editTextContent"
@@ -49,7 +52,8 @@
         android:hint="Enter content"
         android:inputType="textMultiLine"
         android:lines="5"
-        android:minLines="3" />
+        android:minLines="3"
+        android:layout_below="@id/textViewContent" />
 
     <Button
         android:id="@+id/buttonUpload"
@@ -58,6 +62,23 @@
         android:text="Upload"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="24dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/editTextContent" />
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:layout_above="@id/buttonUpload">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

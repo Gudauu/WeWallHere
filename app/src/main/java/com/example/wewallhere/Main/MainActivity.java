@@ -38,14 +38,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
-        // Check if the user has logged in before
-        boolean isLoggedIn = checkLoggedIn();
-
-        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
-        if (!isLoggedIn | DEBUG) {
-            startActivity(new Intent(MainActivity.this, EmailVeriActivity.class));
-            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
-        }
+//        // Check if the user has logged in before
+//        boolean isLoggedIn = checkLoggedIn();
+//
+//        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
+//        if (!isLoggedIn | DEBUG) {
+//            startActivity(new Intent(MainActivity.this, EmailVeriActivity.class));
+//            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
+//        }
 
         //Shutong: give a fake email for now
         SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
