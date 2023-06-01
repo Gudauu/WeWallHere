@@ -2,10 +2,12 @@ package com.example.wewallhere;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.wewallhere.ui.login.LoginActivity;
 
 public class IntroductoryActivity extends AppCompatActivity {
 
@@ -25,5 +27,9 @@ public class IntroductoryActivity extends AppCompatActivity {
         appName.animate().translationY(1600).setDuration(1000).setStartDelay(4000);
         logo.animate().translationY(1850).setDuration(1000).setStartDelay(4000);
         lottieAnimationView.animate().translationY(1600).setDuration(1000).setStartDelay(4000);
+
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
