@@ -156,7 +156,8 @@ public class InfoHomeActivity extends AppCompatActivity {
         userInfo = new UserInfo();
         userInfo.setEmail(prefs.getString("email", getString(R.string.default_email)));
         userInfo.setUsername(prefs.getString("username", getString(R.string.default_usename)));
-        emailTextView.setText(prefs.getString("email", "test@mail.com"));
+        // emailTextView.setText(prefs.getString("email", "test@mail.com"));
+        emailTextView.setText(user.getEmail());
         usernameEditText.setText(prefs.getString("username", getString(R.string.default_usename)));
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -334,7 +335,8 @@ public class InfoHomeActivity extends AppCompatActivity {
         // Handle the log out button click
         // Start the PhoneVerificationActivity to log out the user
         // Intent intent = new Intent(this, PhoneVerificationActivity.class);
-
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
         finish(); // Optional: Finish the current activity to prevent the user from coming back here after logging out
     }
