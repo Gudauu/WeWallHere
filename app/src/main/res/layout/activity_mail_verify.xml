@@ -38,16 +38,42 @@
             android:gravity="center" />
 
     </LinearLayout>
+
     <Button
-        android:id="@+id/send_vlink"
+        android:id="@+id/send_vcode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send verification link"
+        android:text="Send verification code"
         android:textSize="15sp"
         android:layout_below="@id/emailLayout"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true" />
 
+    <LinearLayout
+        android:id="@+id/vcodeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/send_vcode"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/title_vcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter verification code: "
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/input_vcode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:gravity="center" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/verify"
@@ -55,8 +81,8 @@
         android:layout_height="wrap_content"
         android:text="Verify and log in"
         android:textSize="15sp"
+        android:layout_below="@id/vcodeLayout"
         android:layout_marginTop="10dp"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
     <RelativeLayout
