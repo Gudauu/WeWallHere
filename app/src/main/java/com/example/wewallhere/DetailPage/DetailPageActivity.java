@@ -99,7 +99,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
         initTitleBar(top_mongoEntry.getTitle());
         iniTopMedia(top_mongoEntry);
-        iniCommentDialog();
+        iniCommentDialog(top_mongoEntry);
 
         recyclerView = findViewById(R.id.recyclerViewComments);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -219,7 +219,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
     }
 
-    private void iniCommentDialog(){
+    private void iniCommentDialog(MongoMediaEntry mongoEntry){
         comment_type = TYPE_TEXT;
         comment_media_uri = null;
         commentDialog = new Dialog(this);
@@ -280,11 +280,61 @@ public class DetailPageActivity extends AppCompatActivity {
         reply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                commentDialog.show();
+                SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+                String email = prefs.getString("email", getString(R.string.default_email));
+
+                if(email.equals(getString(R.string.admin_email))){
+                    DeletePost(mongoEntry);
+                }else{
+                    commentDialog.show();
+                }
             }
         });
 
 
+    }
+
+    private void DeletePost(MongoMediaEntry mongoEntry){
+        try {
+            // Create a Retrofit instance
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url_media_service) // Replace with your server's IP address
+                    .build();
+            // Create an instance of the API service interface
+            DeletePostService deleteService = retrofit.create(DeletePostService.class);
+
+            // Create a JsonObject and add your data
+            JsonObject data = new JsonObject();
+            data.addProperty("ID", mongoEntry.getID());
+            data.addProperty("filename", mongoEntry.getFilename());
+            data.addProperty("path", mongoEntry.getPath());
+
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
+
+            // Send the image file to the server
+            Call<Void> call = deleteService.deletePost(requestBody);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        // Image uploaded successfully
+                        Toast.makeText(DetailPageActivity.this, "Post deleted.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Handle error response
+                        Toast.makeText(DetailPageActivity.this, "Delete operation failed:", Toast.LENGTH_SHORT).show();
+                        ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    // Handle network failure
+                    ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                }
+            });
+        } catch (Exception e) {
+            ToastHelper.showLongToast(DetailPageActivity.this, "delete operation failed: " + e.getMessage(), Toast.LENGTH_LONG);
+        }
     }
 
 
