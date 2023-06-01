@@ -38,7 +38,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.google.gson.JsonObject;
 
@@ -305,7 +307,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
             // Create a JsonObject and add your data
             JsonObject data = new JsonObject();
-            data.addProperty("ID", mongoEntry.getID());
+            data.addProperty("ID_", mongoEntry.getID());
             data.addProperty("filename", mongoEntry.getFilename());
             data.addProperty("path", mongoEntry.getPath());
 
@@ -319,6 +321,9 @@ public class DetailPageActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         // Image uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Post deleted.", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(DetailPageActivity.this, ExploreListActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
+                        startActivity(intent);
                     } else {
                         // Handle error response
                         Toast.makeText(DetailPageActivity.this, "Delete operation failed:", Toast.LENGTH_SHORT).show();

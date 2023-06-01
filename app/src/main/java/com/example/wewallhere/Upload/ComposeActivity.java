@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 
 
@@ -125,6 +126,8 @@ public class ComposeActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         // Image uploaded successfully
                         Toast.makeText(ComposeActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ComposeActivity.this, UploadActivity.class);
+                        startActivity(intent);
                     } else {
                         // Handle error response
                         Toast.makeText(ComposeActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
@@ -196,6 +199,8 @@ public class ComposeActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         // Video uploaded successfully
                         Toast.makeText(ComposeActivity.this, "Video uploaded successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ComposeActivity.this, UploadActivity.class);
+                        startActivity(intent);
                     } else {
                         // Video upload failed
                         Toast.makeText(ComposeActivity.this, "video upload failed:", Toast.LENGTH_SHORT).show();
