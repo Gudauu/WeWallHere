@@ -58,7 +58,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
     private int REQUEST_SINGLE_LOCATION = 4277;
     private double latitude = 31;
     private double longitude = 121;
-    private double ll_delta = 3;
+    private double ll_delta = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
