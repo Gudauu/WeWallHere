@@ -443,6 +443,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
             // Send the image file to the server
             Call<ResponseBody> call = UploadCommentService.uploadImage(ID, ID_reply, imagePart, contentTitle, contentBody, usernameBody, emailBody);
+            toggleFreezeAndLoad(true);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -455,6 +456,8 @@ public class DetailPageActivity extends AppCompatActivity {
                         // Handle error response
                         Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
                         ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
+                        toggleFreezeAndLoad(false);
+
                     }
                 }
 
@@ -462,10 +465,12 @@ public class DetailPageActivity extends AppCompatActivity {
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
                     // Handle network failure
                     ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
+                    toggleFreezeAndLoad(false);
                 }
             });
         } catch (Exception e) {
             ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed:" + e.getMessage(), Toast.LENGTH_LONG);
+            toggleFreezeAndLoad(false);
         }
     }
     private void uploadTextCommentToServer(String replyID, String title, String content) {
@@ -490,15 +495,18 @@ public class DetailPageActivity extends AppCompatActivity {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
 
             // Send the image file to the server
+            toggleFreezeAndLoad(true);
             Call<Void> call = UploadCommentService.uploadText(requestBody);
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        // Image uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
+                        updateComment();
+                        commentDialog.dismiss();
                     } else {
                         // Handle error response
+                        toggleFreezeAndLoad(false);
                         Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
                         ToastHelper.showLongToast(getApplicationContext(), response.message(),Toast.LENGTH_LONG);
                     }
@@ -507,10 +515,12 @@ public class DetailPageActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
                     // Handle network failure
+                    toggleFreezeAndLoad(false);
                     ToastHelper.showLongToast(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e) {
+            toggleFreezeAndLoad(false);
             ToastHelper.showLongToast(DetailPageActivity.this, "comment post failed: " + e.getMessage(), Toast.LENGTH_LONG);
         }
     }
@@ -551,6 +561,7 @@ public class DetailPageActivity extends AppCompatActivity {
             // Create the API service interface
             UploadCommentService UploadCommentService = retrofit.create(UploadCommentService.class);
 
+            toggleFreezeAndLoad(true);
             // Create the API call to upload the video
             Call<ResponseBody> call = UploadCommentService.uploadVideo(ID, ID_reply, videoPart,contentTitle, contentBody, usernameBody, emailBody);
 
@@ -561,8 +572,10 @@ public class DetailPageActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         // Video uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
+                        updateComment();
+                        commentDialog.dismiss();
                     } else {
-                        // Video upload failed
+                        toggleFreezeAndLoad(false);
                         Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -570,14 +583,26 @@ public class DetailPageActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
                     // Handle the upload failure
+                    toggleFreezeAndLoad(false);
                     ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed: " + t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e){
+            toggleFreezeAndLoad(false);
             ToastHelper.showLongToast(DetailPageActivity.this, "Comment post failed: " + e, Toast.LENGTH_LONG);
-
         }
 
+    }
+
+    private void toggleFreezeAndLoad(boolean start) {
+        RelativeLayout loadingPanel = commentDialog.findViewById(R.id.loadingPanel);
+        if (start) {
+            loadingPanel.setVisibility(View.VISIBLE);
+            buttonSubmit.setEnabled(false); // Disable the button
+        } else {
+            loadingPanel.setVisibility(View.GONE);
+            buttonSubmit.setEnabled(true); // Enable the button
+        }
     }
 
 
