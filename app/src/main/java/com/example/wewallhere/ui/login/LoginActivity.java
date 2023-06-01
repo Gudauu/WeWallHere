@@ -1,44 +1,32 @@
 package com.example.wewallhere.ui.login;
 
-import android.app.Activity;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.wewallhere.Main.MainActivity;
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
-import com.example.wewallhere.RegisterActivity;
-import com.example.wewallhere.ui.login.LoginViewModel;
-import com.example.wewallhere.ui.login.LoginViewModelFactory;
-import com.example.wewallhere.databinding.ActivityLoginBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class LoginActivity extends AppCompatActivity {
+import java.util.regex.Pattern;
 
+public class LoginActivity extends AppCompatActivity {
 //    private LoginViewModel loginViewModel;
 //    private ActivityLoginBinding binding;
     FirebaseAuth mAuth;
@@ -54,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ExploreListActivity.class);
             startActivity(intent);
             finish();
         }
@@ -75,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), com.example.wewallhere.RegisterActivity.class);
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -93,11 +81,16 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Enter email", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if(!isValidEmail(email)){
+                    Toast.makeText(LoginActivity.this, "Please enter a valid email address.", Toast.LENGTH_SHORT).show();
+                }
 
                 if (TextUtils.isEmpty(password)) {
                     Toast.makeText(LoginActivity.this, "Enter password", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+
 
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -107,11 +100,13 @@ public class LoginActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                         Toast.makeText(getApplicationContext(), "Login Successful",
                                                 Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(getApplicationContext(), com.example.wewallhere.Main.MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                } else {
 
+                                        SaveEmailToSharedPref(email);
+                                        goToExploreList();
+                                        //Intent intent = new Intent(getApplicationContext(), com.example.wewallhere.Main.MainActivity.class);
+                                        //startActivity(intent);
+                                        //finish();
+                                } else {
                                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
                                 }
@@ -120,6 +115,27 @@ public class LoginActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void goToExploreList(){
+        Intent intent = new Intent(getApplicationContext(), ExploreListActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void SaveEmailToSharedPref(String email){
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        prefs.edit().putString("email", email).commit();
+    }
+
+    public boolean isValidEmail(String str_email) {
+        // Regular expression pattern for email validation
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+
+        // Create a Pattern object with the email regex
+        Pattern pattern = Pattern.compile(emailRegex);
+        // Use the Pattern object to match the email address
+        return pattern.matcher(str_email).matches();
     }
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {

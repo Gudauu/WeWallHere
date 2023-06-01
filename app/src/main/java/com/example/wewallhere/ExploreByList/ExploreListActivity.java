@@ -1,5 +1,7 @@
 package com.example.wewallhere.ExploreByList;
 
+import static android.view.View.GONE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,7 +21,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.ComposeActivity;
 import com.example.wewallhere.Upload.UploadActivity;
@@ -47,7 +48,6 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
     private RecyclerView recyclerView;
     private MediaAdapter mediaAdapter;
     private TabLayout tabLayout;
-    private Spinner dropdownMenu;
     private List<MongoMediaEntry> mongoMetaList = new ArrayList<>();
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
@@ -58,7 +58,9 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
     private int REQUEST_SINGLE_LOCATION = 4277;
     private double latitude = 31;
     private double longitude = 121;
-    private double ll_delta = 10;
+    private double ll_delta = 1;
+    private double[] distances_ll = new double[]{0.001, 0.02, 1, 10, 400};
+    private String[] distances = new String[]{"50m","1km","50km", "500km", "ALL"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,9 +127,20 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
             }
         });
 
+        iniMediaTypeDropDownMenu();
+        // if self_only(viewing history), fetch all.
+        if (!self_only) {
+            iniRadiusDropDownMenu();
+        }else{
+            Spinner dropdownMenu_radius = findViewById(R.id.dropdownMenu_radius);
+            dropdownMenu_radius.setVisibility(GONE);
+        }
 
+
+    }
+    private void iniMediaTypeDropDownMenu(){
         // Set up dropdown menu options for image/video selection
-        dropdownMenu = findViewById(R.id.dropdownMenu);
+        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, new String[]{"image", "video"});
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -151,9 +164,31 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
 
         dropdownMenu.setSelection(0); // Set the initial selection to the first item ("Images")
 
+    }
+    private void iniRadiusDropDownMenu(){
+        // Set up dropdown menu options for radius selection
+        Spinner dropdownMenu_radius = findViewById(R.id.dropdownMenu_radius);
+        ArrayAdapter<String> dropdownAdapter_radius = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, distances);
+        dropdownAdapter_radius.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dropdownMenu_radius.setAdapter(dropdownAdapter_radius);
 
+        // Set up dropdown menu item selection listener
+        dropdownMenu_radius.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                double new_radius = distances_ll[position];
+                if(new_radius != ll_delta){
+                    ll_delta = new_radius;
+                    updateBasedOnCondition();
+                }
 
-
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        dropdownMenu_radius.setSelection(2); // Set the initial selection to 50km (ll 1)
     }
 
 
@@ -199,19 +234,19 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
             String email = prefs.getString("email", getString(R.string.default_email));
             jsonFilter = "{\"email\": \"" + email + "\"}";
         }else {
-                double minLatitude = latitude - ll_delta;
-                double maxLatitude = latitude + ll_delta;
-                double minLongitude = longitude - ll_delta;
-                double maxLongitude = longitude + ll_delta;
-                // Format the latitude and longitude values with 8 decimal places
-                String formattedMinLatitude = String.format("%.8f", minLatitude);
-                String formattedMaxLatitude = String.format("%.8f", maxLatitude);
-                String formattedMinLongitude = String.format("%.8f", minLongitude);
-                String formattedMaxLongitude = String.format("%.8f", maxLongitude);
+            double minLatitude = latitude - ll_delta;
+            double maxLatitude = latitude + ll_delta;
+            double minLongitude = longitude - ll_delta;
+            double maxLongitude = longitude + ll_delta;
+            // Format the latitude and longitude values with 8 decimal places
+            String formattedMinLatitude = String.format("%.8f", minLatitude);
+            String formattedMaxLatitude = String.format("%.8f", maxLatitude);
+            String formattedMinLongitude = String.format("%.8f", minLongitude);
+            String formattedMaxLongitude = String.format("%.8f", maxLongitude);
 
-                // Construct the filter JSON string
-                jsonFilter = String.format("{\"latitude\": {\"$gte\": %s, \"$lte\": %s}, \"longitude\": {\"$gte\": %s, \"$lte\": %s}}",
-                        formattedMinLatitude, formattedMaxLatitude, formattedMinLongitude, formattedMaxLongitude);
+            // Construct the filter JSON string
+            jsonFilter = String.format("{\"latitude\": {\"$gte\": %s, \"$lte\": %s}, \"longitude\": {\"$gte\": %s, \"$lte\": %s}}",
+                    formattedMinLatitude, formattedMaxLatitude, formattedMinLongitude, formattedMaxLongitude);
 
         }
         return jsonFilter;
@@ -297,16 +332,6 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
         // Create a new adapter with the updated media list
         mediaAdapter = new MediaAdapter(mongoMetaList, url_download, getApplicationContext());
         recyclerView.setAdapter(mediaAdapter);
-    }
-
-
-    // go to main page when scrolling back
-    @Override
-    public void onBackPressed() {
-        // Start the main activity or perform any other navigation action
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
-        startActivity(intent);
     }
 
 

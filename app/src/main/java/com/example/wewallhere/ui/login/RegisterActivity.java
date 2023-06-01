@@ -1,9 +1,10 @@
-package com.example.wewallhere;
+package com.example.wewallhere.ui.login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -12,15 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.wewallhere.Main.MainActivity;
-import com.example.wewallhere.ui.login.LoginActivity;
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
+import com.example.wewallhere.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -37,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ExploreListActivity.class);
             startActivity(intent);
             finish();
         }
@@ -66,7 +65,6 @@ public class RegisterActivity extends AppCompatActivity {
         buttonReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
                 String email, password;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
@@ -80,6 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Enter password", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                progressBar.setVisibility(View.VISIBLE);
 
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -89,6 +88,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(RegisterActivity.this, "Account created.",
                                             Toast.LENGTH_SHORT).show();
+                                    progressBar.setVisibility(View.GONE);
+                                    SaveEmailToSharedPref(email);
                                     Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                     startActivity(intent);
                                     finish();
@@ -100,8 +101,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 }
                             }
                         });
-                progressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void SaveEmailToSharedPref(String email){
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        prefs.edit().putString("email", email).commit();
     }
 }
