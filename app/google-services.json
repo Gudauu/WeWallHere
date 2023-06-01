@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "582819059463",
+    "project_id": "wewallhere",
+    "storage_bucket": "wewallhere.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582819059463:android:13097757177dc5fe3257a2",
+        "android_client_info": {
+          "package_name": "com.example.wewallhere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-m1ncfTowoacU4__A4-MYF_09xtkRWbo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
