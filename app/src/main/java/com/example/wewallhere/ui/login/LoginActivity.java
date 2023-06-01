@@ -38,6 +38,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.regex.Pattern;
+
 public class LoginActivity extends AppCompatActivity {
 
 //    private LoginViewModel loginViewModel;
@@ -94,11 +96,16 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Enter email", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if(!isValidEmail(email)){
+                    Toast.makeText(LoginActivity.this, "Please enter a valid email address.", Toast.LENGTH_SHORT).show();
+                }
 
                 if (TextUtils.isEmpty(password)) {
                     Toast.makeText(LoginActivity.this, "Enter password", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+
 
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -120,6 +127,16 @@ public class LoginActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    public boolean isValidEmail(String str_email) {
+        // Regular expression pattern for email validation
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+
+        // Create a Pattern object with the email regex
+        Pattern pattern = Pattern.compile(emailRegex);
+        // Use the Pattern object to match the email address
+        return pattern.matcher(str_email).matches();
     }
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {
