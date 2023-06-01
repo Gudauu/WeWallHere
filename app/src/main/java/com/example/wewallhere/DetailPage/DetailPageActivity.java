@@ -42,6 +42,8 @@ import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.Upload.ComposeActivity;
+import com.example.wewallhere.Upload.UploadActivity;
 import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;
@@ -63,6 +65,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailPageActivity extends AppCompatActivity {
+    private MongoMediaEntry mongoMediaEntry;
     private RecyclerView recyclerView;
     private CommentAdapter commentAdapter;
     private List<MongoCommentEntry> mongoCommentList = new ArrayList<>();
@@ -446,6 +449,8 @@ public class DetailPageActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         // Image uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
+                        updateComment();
+                        commentDialog.dismiss();
                     } else {
                         // Handle error response
                         Toast.makeText(DetailPageActivity.this, "Comment post failed:", Toast.LENGTH_SHORT).show();
