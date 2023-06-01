@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.Main.MainActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.RegisterActivity;
@@ -54,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ExploreListActivity.class);
             startActivity(intent);
             finish();
         }
@@ -111,7 +112,6 @@ public class LoginActivity extends AppCompatActivity {
                                         //startActivity(intent);
                                         //finish();
                                 } else {
-
                                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
                                 }
