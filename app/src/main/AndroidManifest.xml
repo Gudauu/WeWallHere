@@ -41,7 +41,6 @@
         <activity android:name=".DetailPage.DetailPageActivity" />
         <activity android:name=".User.PhoneVerificationActivity" />
         <activity android:name=".User.InfoHomeActivity" />
-        <activity android:name=".User.EmailVerificationActivity" />
 
     </application>
 
