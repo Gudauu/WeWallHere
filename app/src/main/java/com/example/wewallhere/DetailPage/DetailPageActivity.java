@@ -431,7 +431,7 @@ public class DetailPageActivity extends AppCompatActivity {
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
 
             SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_username)));
             RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
 
 
@@ -486,7 +486,7 @@ public class DetailPageActivity extends AppCompatActivity {
             data.addProperty("ID_reply", replyID);
             data.addProperty("title", "reply");
             data.addProperty("content", content);
-            data.addProperty("username", prefs.getString("username", getString(R.string.default_usename)));
+            data.addProperty("username", prefs.getString("username", getString(R.string.default_username)));
             data.addProperty("email", prefs.getString("email", getString(R.string.default_email)));
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
@@ -551,7 +551,7 @@ public class DetailPageActivity extends AppCompatActivity {
             RequestBody contentTitle = RequestBody.create(MediaType.parse("text/plain"), title);
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
             SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_username)));
             RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
 
 

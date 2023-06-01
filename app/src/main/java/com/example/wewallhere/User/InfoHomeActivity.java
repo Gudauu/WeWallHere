@@ -154,11 +154,12 @@ public class InfoHomeActivity extends AppCompatActivity {
     private void fetchUserInfo(){
         SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
         userInfo = new UserInfo();
+        String pref_email = prefs.getString("email", getString(R.string.default_email));
         userInfo.setEmail(prefs.getString("email", getString(R.string.default_email)));
         emailTextView.setText(user.getEmail());
 
-        userInfo.setUsername(prefs.getString("username", getString(R.string.default_usename)));
-        usernameEditText.setText(prefs.getString("username", getString(R.string.default_usename)));
+        userInfo.setUsername(prefs.getString("username", getString(R.string.default_username)));
+        usernameEditText.setText(prefs.getString("username", getString(R.string.default_username)));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url_media_service)

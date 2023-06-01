@@ -108,7 +108,7 @@ public class ComposeActivity extends AppCompatActivity {
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
 
             SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_username)));
             RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
 
 
@@ -179,7 +179,7 @@ public class ComposeActivity extends AppCompatActivity {
             RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), title);
             RequestBody contentBody = RequestBody.create(MediaType.parse("text/plain"), content);
             SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_usename)));
+            RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("username", getString(R.string.default_username)));
             RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), prefs.getString("email", getString(R.string.default_email)));
 
 
