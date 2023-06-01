@@ -27,7 +27,6 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity {
-
 //    private LoginViewModel loginViewModel;
 //    private ActivityLoginBinding binding;
     FirebaseAuth mAuth;
@@ -64,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), com.example.wewallhere.RegisterActivity.class);
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
                 startActivity(intent);
                 finish();
             }

@@ -1,4 +1,4 @@
-package com.example.wewallhere;
+package com.example.wewallhere.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.wewallhere.R;
 
 public class IntroductoryActivity extends AppCompatActivity {
 

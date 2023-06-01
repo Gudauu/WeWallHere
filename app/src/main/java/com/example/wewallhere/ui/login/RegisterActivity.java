@@ -1,4 +1,4 @@
-package com.example.wewallhere;
+package com.example.wewallhere.ui.login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
-import com.example.wewallhere.ui.login.LoginActivity;
+import com.example.wewallhere.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
