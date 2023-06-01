@@ -155,9 +155,9 @@ public class InfoHomeActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
         userInfo = new UserInfo();
         userInfo.setEmail(prefs.getString("email", getString(R.string.default_email)));
-        userInfo.setUsername(prefs.getString("username", getString(R.string.default_usename)));
-        // emailTextView.setText(prefs.getString("email", "test@mail.com"));
         emailTextView.setText(user.getEmail());
+
+        userInfo.setUsername(prefs.getString("username", getString(R.string.default_usename)));
         usernameEditText.setText(prefs.getString("username", getString(R.string.default_usename)));
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -183,6 +183,7 @@ public class InfoHomeActivity extends AppCompatActivity {
                     if(userInfo.getUsername() != null){
                         usernameEditText.setText(userInfo.getUsername());
                     }
+                    saveToSharedPrefs(userInfo.getUsername(),userInfo.getPhone());
                 } else {
                     ToastHelper.showLongToast(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
                 }
@@ -235,11 +236,20 @@ public class InfoHomeActivity extends AppCompatActivity {
 
     }
 
+    private void saveToSharedPrefs(String username, String phone){
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        if(username != null){
+            prefs.edit().putString("username",username).commit();
+        }
+        if(phone != null){
+            prefs.edit().putString("phone",phone).commit();
+        }
+
+    }
     private void saveUserInfo() {
         fetchEditTexts();
         // save username to sharedpreferences
-        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-        prefs.edit().putString("username",userInfo.getUsername()).commit();
+        saveToSharedPrefs(userInfo.getUsername(), userInfo.getPhone());
 
         try {
             // Create a Retrofit instance
@@ -336,10 +346,16 @@ public class InfoHomeActivity extends AppCompatActivity {
         // Start the PhoneVerificationActivity to log out the user
         // Intent intent = new Intent(this, PhoneVerificationActivity.class);
         FirebaseAuth.getInstance().signOut();
+        clearUpSharedPrefs();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish(); // Optional: Finish the current activity to prevent the user from coming back here after logging out
+    }
+
+    private void clearUpSharedPrefs(){
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        prefs.edit().clear().commit();
     }
 
     // pfp image
