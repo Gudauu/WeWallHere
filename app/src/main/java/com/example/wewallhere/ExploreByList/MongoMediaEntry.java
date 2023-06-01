@@ -21,9 +21,10 @@ public class MongoMediaEntry implements Serializable {
     private int comment_count;
 
 
-    public MongoMediaEntry(String filename, String path, double latitude, double longitude,
+    public MongoMediaEntry(String ID, String filename, String path, double latitude, double longitude,
                            String timestamp,String title, String content, String uploaderName, String uploaderEmail,
                            int comment_count) {
+        this.ID = ID;
         this.filename = filename;
         this.path = path;
         this.latitude = latitude;

@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Shutong: give a fake email for now
         SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-        prefs.edit().putString("email", getString(R.string.default_email2)).commit();
+        prefs.edit().putString("email", getString(R.string.admin_email)).commit();
 //        prefs.edit().putString("username", getString(R.string.default_usename)).commit();
         // Continue with rendering the MainActivity page
         setContentView(R.layout.activity_main);
