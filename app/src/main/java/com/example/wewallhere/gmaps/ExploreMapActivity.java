@@ -1,5 +1,7 @@
 package com.example.wewallhere.gmaps;
 
+import static android.view.View.GONE;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -69,7 +71,9 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
     private int REQUEST_SINGLE_LOCATION = 4277;
     private double latitude = 31;
     private double longitude = 121;
-    private double ll_delta = 3;
+    private double ll_delta = 1;
+    private double[] distances_ll = new double[]{0.001, 0.02, 1, 10, 200};
+    private String[] distances = new String[]{"50m","1km","50km", "500km", "ALL"};
 
 
 
@@ -131,9 +135,20 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
 
+        iniMediaTypeDropDownMenu();
 
+        // if self_only(viewing history), fetch all.
+        if (!self_only) {
+            iniRadiusDropDownMenu();
+        }else{
+            Spinner dropdownMenu_radius = findViewById(R.id.dropdownMenu_radius);
+            dropdownMenu_radius.setVisibility(GONE);
+        }
+
+    }
+    private void iniMediaTypeDropDownMenu(){
         // Set up dropdown menu options for image/video selection
-        dropdownMenu = findViewById(R.id.dropdownMenu);
+        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
         ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, new String[]{"image", "video"});
         dropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -157,6 +172,31 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
         dropdownMenu.setSelection(0); // Set the initial selection to the first item ("Images")
 
+    }
+    private void iniRadiusDropDownMenu(){
+        // Set up dropdown menu options for radius selection
+        Spinner dropdownMenu_radius = findViewById(R.id.dropdownMenu_radius);
+        ArrayAdapter<String> dropdownAdapter_radius = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, distances);
+        dropdownAdapter_radius.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dropdownMenu_radius.setAdapter(dropdownAdapter_radius);
+
+        // Set up dropdown menu item selection listener
+        dropdownMenu_radius.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                double new_radius = distances_ll[position];
+                if(new_radius != ll_delta){
+                    ll_delta = new_radius;
+                    updateBasedOnCondition();
+                }
+
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        dropdownMenu_radius.setSelection(2); // Set the initial selection to 50km (ll 1)
     }
 
     private void iniBottomMenu(){
