@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">WeWallHere</string>
+    <string name="default_usename">PotatoHead</string>
+    <string name="default_email">potato_test@mail.com</string>
+    <string name="default_email2">potato_test2@mail.com</string>
+    <string name="admin_email">admin@mail.com</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
 </resources>

@@ -5,11 +5,13 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface MongoMetaService {
-    @GET("mongometa/{type}")
+    @GET("mongometa/media/{type}")
     Call<List<MongoMediaEntry>> getMetaDataList(
-            @Path("type") String type
+            @Path("type") String type,
+            @Query("filter") String filter // Dynamic query parameter for the filter
     );
 }
 

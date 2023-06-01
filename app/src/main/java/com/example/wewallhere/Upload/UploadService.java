@@ -12,17 +12,27 @@ public interface UploadService {
     @Multipart
     @POST("/upload") // Replace with your server's upload endpoint
     Call<ResponseBody> uploadImage(
+            @Part("ID") RequestBody ID,
             @Part MultipartBody.Part image,
             @Part("latitude") RequestBody latitude,
-            @Part("longitude") RequestBody longitude
+            @Part("longitude") RequestBody longitude,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content,
+            @Part("username") RequestBody username,
+            @Part("email") RequestBody email
     );
 
     @Multipart
     @POST("/upload") // Replace with your server's upload endpoint
     Call<ResponseBody> uploadVideo(
+            @Part("ID") RequestBody ID,
             @Part MultipartBody.Part video,
             @Part("latitude") RequestBody latitude,
-            @Part("longitude") RequestBody longitude
+            @Part("longitude") RequestBody longitude,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content,
+            @Part("username") RequestBody username,
+            @Part("email") RequestBody email
     );
 }
 

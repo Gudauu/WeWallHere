@@ -2,15 +2,19 @@ package com.example.wewallhere.gmaps;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wewallhere.DetailPage.DetailPageActivity;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMetaService;
 import com.example.wewallhere.Main.MainActivity;
@@ -19,9 +23,12 @@ import com.example.wewallhere.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
+import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.User.InfoHomeActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -30,8 +37,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -48,7 +57,6 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
     private GoogleMap googleMap;
     private MapView mapView;
-
     private TabLayout tabLayout;
     private Toolbar topbar;
     private Spinner dropdownMenu;
@@ -56,6 +64,13 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
     private String url_media_service = "http://54.252.196.140:3000/";
 
     private String media_type = "image";
+    private boolean self_only = false;
+    private SingleLocation singleLocation;
+    private int REQUEST_SINGLE_LOCATION = 4277;
+    private double latitude = 31;
+    private double longitude = 121;
+    private double ll_delta = 3;
+
 
 
 
@@ -63,9 +78,15 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explore_maps);
+
+        Intent intent = getIntent();
+        self_only = intent.getBooleanExtra("self_only", false);
+
         initTopBar();
+        iniBottomMenu();
 
         // Obtain the MapView and initialize it
+        singleLocation = new SingleLocation(this);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
@@ -82,6 +103,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
         tabLayout.addTab(listViewTab);
         tabLayout.addTab(mapViewTab);
+
         mapViewTab.select();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -91,6 +113,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 if (position == 0) {
                     // Handle the click on the "List View" tab
                     Intent listIntent = new Intent(ExploreMapActivity.this, ExploreListActivity.class);
+                    listIntent.putExtra("self_only", self_only);
                     startActivity(listIntent);
                 } else if (position == 1) {
                     // do nothing
@@ -123,7 +146,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 String new_media_type = parent.getItemAtPosition(position).toString();
                 if(!new_media_type.equals(media_type)){
                     media_type = new_media_type;
-                    updateMedia();
+                    updateBasedOnCondition();
                 }
 
             }
@@ -136,6 +159,37 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
     }
 
+    private void iniBottomMenu(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        // if is viewing history, stay in "info" section
+        if(!self_only) {
+            bottomNavigationView.setSelectedItemId(R.id.explore);
+        }else{
+            bottomNavigationView.setSelectedItemId(R.id.info);
+
+        }
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.upload) {
+                startActivity(new Intent(ExploreMapActivity.this, UploadActivity.class));
+                return true;
+            }  else if (itemId == R.id.info) {
+                startActivity(new Intent(ExploreMapActivity.this, InfoHomeActivity.class));
+                return true;
+            }  else if (itemId == R.id.explore && self_only) {  // it's viewing history in info tag actually.
+                startActivity(new Intent(ExploreMapActivity.this, ExploreListActivity.class));
+                return true;
+            }
+//            } else if (itemId == R.id.navigation_item3) {
+//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
+//                return true;
+//            }
+
+            return false;
+        });
+
+    }
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
@@ -150,52 +204,104 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         }
         // Enable the "My Location" button
         googleMap.setMyLocationEnabled(true);
+        centerAroundMe();
+
 
         // Set a click listener on the "My Location" button to center the map
         googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-                // Center the map around the user's current location
-                if (ContextCompat.checkSelfPermission(ExploreMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    // Get the user's current location
-                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(ExploreMapActivity.this);
-                    fusedLocationClient.getLastLocation()
-                            .addOnSuccessListener(new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(Location location) {
-                                    if (location != null) {
-                                        // Center the map on the user's location
-                                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f);
-                                        googleMap.animateCamera(cameraUpdate);
-                                    }
-                                }
-                            });
-                }
+                centerAroundMe();
                 return true;
             }
         });
 
         // Add markers for media files on the map
-        updateMedia();
+        updateBasedOnCondition();
     }
 
-
-    private void updateMediaMarkers() {
-        // Retrieve the list of media files with their latitude and longitude
-        // Add markers for each media file on the map
-        googleMap.clear();
-        for (MongoMediaEntry media : mongoMetaList) {
-            LatLng position = new LatLng(media.getLatitude(), media.getLongitude());
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(position)
-                    .title(media.getTitle())
-                    .snippet(media.getUploaderName());
-            googleMap.addMarker(markerOptions);
+    private void centerAroundMe(){
+        // Center the map around the user's current location
+        if (ContextCompat.checkSelfPermission(ExploreMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // Get the user's current location
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(ExploreMapActivity.this);
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                // Center the map on the user's location
+                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f);
+                                googleMap.animateCamera(cameraUpdate);
+                            }
+                        }
+                    });
         }
     }
 
-    private void updateMedia() {
+
+
+    // ll_delta: search in range [latitude +- ll_delta, longitude +- ll_delta]
+    private String geneFilter(){
+        // Create a JSON filter based on your requirements
+        String jsonFilter;
+
+        if(self_only){
+            SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+            String email = prefs.getString("email", getString(R.string.default_email));
+            jsonFilter = "{\"email\": \"" + email + "\"}";
+        }else {
+            double minLatitude = latitude - ll_delta;
+            double maxLatitude = latitude + ll_delta;
+            double minLongitude = longitude - ll_delta;
+            double maxLongitude = longitude + ll_delta;
+            // Format the latitude and longitude values with 8 decimal places
+            String formattedMinLatitude = String.format("%.8f", minLatitude);
+            String formattedMaxLatitude = String.format("%.8f", maxLatitude);
+            String formattedMinLongitude = String.format("%.8f", minLongitude);
+            String formattedMaxLongitude = String.format("%.8f", maxLongitude);
+
+            // Construct the filter JSON string
+            jsonFilter = String.format("{\"latitude\": {\"$gte\": %s, \"$lte\": %s}, \"longitude\": {\"$gte\": %s, \"$lte\": %s}}",
+                    formattedMinLatitude, formattedMaxLatitude, formattedMinLongitude, formattedMaxLongitude);
+
+        }
+        return jsonFilter;
+
+
+    }
+
+    private void updateBasedOnCondition(){
+        if(!self_only){
+            // need location
+            if (checkSingleLocationPermission()) {
+                // fetch location, then load
+                singleLocation.getLocation(new SingleLocation.LocationCallback() {
+                    @Override
+                    public void onLocationReceived(double la, double lo) {
+                        latitude = la;
+                        longitude = lo;
+                        String filter = geneFilter();
+                        updateMedia(filter);
+                    }
+                });
+            } else {
+                // Request the necessary permissions
+                String[] permissions = new String[]{
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                };
+                ActivityCompat.requestPermissions(this, permissions, REQUEST_SINGLE_LOCATION);
+            }
+
+        }else{ // location doesn't matter
+            String filter = geneFilter();
+            updateMedia(filter);
+        }
+    }
+
+    private void updateMedia(String filter) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url_media_service)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -205,12 +311,13 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         MongoMetaService mongoMetaService = retrofit.create(MongoMetaService.class);
 
         // Make an API call to retrieve media files
-        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList(media_type);  // , "image_1684667427711_388"
+        Call<List<MongoMediaEntry>> call = mongoMetaService.getMetaDataList(media_type, filter);  // , "image_1684667427711_388"
         call.enqueue(new Callback<List<MongoMediaEntry>>() {
             @Override
             public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
                 if (response.isSuccessful()) {
                     List<MongoMediaEntry> mediaEntries = response.body();
+
                     // Handle the retrieved media entries
                     mongoMetaList.clear();
                     mongoMetaList.addAll(mediaEntries);
@@ -229,6 +336,63 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
         });
 
     }
+
+    private void updateMediaMarkers() {
+        // Retrieve the list of media files with their latitude and longitude
+        // Add markers for each media file on the map
+        googleMap.clear();
+        for (MongoMediaEntry media : mongoMetaList) {
+            LatLng position = new LatLng(media.getLatitude(), media.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(position)
+                    .title(media.getTitle())
+                    .snippet(media.getUploaderName());
+            Marker marker = googleMap.addMarker(markerOptions);
+            marker.setTag(media); // Set the media entry as the tag of the marker
+        }
+
+        // Set a custom info window adapter for the markers
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null; // Return null to use the default info window layout
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                // Inflate a custom info window layout
+                View infoWindow = getLayoutInflater().inflate(R.layout.item_map_marker_info, null);
+
+                // Find the views within the custom info window layout
+                TextView titleTextView = infoWindow.findViewById(R.id.titleTextView);
+                TextView uploaderTextView = infoWindow.findViewById(R.id.uploaderTextView);
+
+                // Retrieve the media entry from the marker's tag
+                MongoMediaEntry media = (MongoMediaEntry) marker.getTag();
+
+                // Set the title and uploader name in the custom info window layout
+                titleTextView.setText(media.getTitle());
+                uploaderTextView.setText(media.getUploaderName());
+
+                return infoWindow;
+            }
+        });
+
+        // Set an info window click listener for the markers
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Retrieve the media entry from the marker's tag
+                MongoMediaEntry media = (MongoMediaEntry) marker.getTag();
+                Intent intent = new Intent(ExploreMapActivity.this, DetailPageActivity.class);
+                // Pass the selected media entry as an extra to the new activity
+                intent.putExtra("MongoMediaEntry", media);
+                startActivity(intent);
+            }
+        });
+    }
+
+
 
 
     private boolean checkSingleLocationPermission(){

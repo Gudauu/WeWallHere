@@ -1,21 +1,21 @@
 package com.example.wewallhere.Main;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.example.wewallhere.User.EmailVeriActivity;
+import com.example.wewallhere.User.PhoneVerificationActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
@@ -31,10 +31,32 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
     };
+    private boolean DEBUG = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+//        // Check if the user has logged in before
+//        boolean isLoggedIn = checkLoggedIn();
+//
+//        // If not logged in or last login was more than 30 days ago, redirect to PhoneVerificationActivity
+//        if (!isLoggedIn | DEBUG) {
+//            startActivity(new Intent(MainActivity.this, EmailVeriActivity.class));
+//            finish(); // Optional: Finish the MainActivity so that the user cannot go back to it without verification
+//        }
+
+        //Shutong: give a fake email for now
+        SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+        prefs.edit().putString("email", getString(R.string.default_email2)).commit();
+//        prefs.edit().putString("email", getString(R.string.admin_email)).commit();
+//        prefs.edit().putString("username", getString(R.string.default_usename)).commit();
+        // Continue with rendering the MainActivity page
         setContentView(R.layout.activity_main);
+
+
+
 
         buttonToUploadSection = findViewById(R.id.go_to_upload_section);
         buttonToUploadSection.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_EXPLORE_ACTIVITY) {
             // Check if all required permissions are granted, including media & location
@@ -88,6 +110,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private boolean checkLoggedIn() {
+        // Retrieve the last login date from SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("INFO", MODE_PRIVATE);
+        long lastLoginTimestamp = sharedPreferences.getLong("lastLogin", 0);
+
+        // Check if the last login is within 30 days from now
+        long currentTimestamp = System.currentTimeMillis();
+        long thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000L;
+        boolean isWithinThirtyDays = (currentTimestamp - lastLoginTimestamp) <= thirtyDaysInMillis;
+
+        return isWithinThirtyDays;
+    }
+
     // go to main page when scrolling back
     @Override
     public void onBackPressed() {

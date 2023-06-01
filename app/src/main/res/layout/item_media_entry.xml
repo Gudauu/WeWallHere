@@ -21,18 +21,36 @@
             android:layout_height="220dp"
             android:scaleType="centerCrop" />
 <!--            android:scaleType="fitCenter" />-->
-
         <VideoView
             android:id="@+id/videoViewMedia"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:visibility="gone"
             android:layout_gravity="center" />
+        <ImageView
+            android:id="@+id/imageViewThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:visibility="gone"
+            android:layout_gravity="center" />
+        <RelativeLayout
+            android:id="@+id/loadingPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center" >
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+        </RelativeLayout>
+
+
 
     </FrameLayout>
 
     <!-- User profile pic, title, uploader name, date of uploading -->
     <LinearLayout
+        android:id="@+id/details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -40,8 +58,8 @@
         <!-- User profile pic -->
         <ImageView
             android:id="@+id/imageViewProfilePic"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/ic_launcher_foreground"/>
 
         <LinearLayout
@@ -54,7 +72,7 @@
                 android:id="@+id/textViewTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="18sp"
                 android:text="Fish turned red after taking dried shrimp!"
                 android:textStyle="bold" />
             <RelativeLayout
@@ -66,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PotatoHead"
-                    android:textSize="11sp"
+                    android:textSize="15sp"
                     android:layout_alignParentStart="true" />
 
                 <TextView
@@ -74,7 +92,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2022-01-01"
-                    android:textSize="11sp"
+                    android:textSize="14sp"
                     android:layout_marginRight="10dp"
                     android:layout_alignParentEnd="true" />
 
