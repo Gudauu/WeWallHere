@@ -20,10 +20,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.ui.login.LoginActivity;
 import com.example.wewallhere.Upload.ComposeActivity;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.JsonObject;
 
 
@@ -58,6 +60,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InfoHomeActivity extends AppCompatActivity {
     FirebaseAuth auth;
+    FirebaseUser user;
     private ImageView profileImageView;
     private EditText usernameEditText;
     private EditText phoneEditText;
@@ -77,6 +80,8 @@ public class InfoHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info_home);
         iniBottomMenu();
 
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         profileImageView = findViewById(R.id.profile_picture);
         usernameEditText = findViewById(R.id.username);
         phoneEditText = findViewById(R.id.phone);
@@ -85,8 +90,13 @@ public class InfoHomeActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.save_info_button);
         logoutButton = findViewById(R.id.log_out_button);
 
-        fetchUserInfo();
-
+        if (user == null) {
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            fetchUserInfo();
+        }
 
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
