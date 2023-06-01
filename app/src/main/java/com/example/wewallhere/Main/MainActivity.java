@@ -14,17 +14,21 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.example.wewallhere.AppUpdate.AppUpdate;
 import com.example.wewallhere.User.EmailVeriActivity;
 import com.example.wewallhere.User.PhoneVerificationActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 
+import Helper.ToastHelper;
+
 public class MainActivity extends AppCompatActivity {
     private Button buttonToUploadSection;
     private Button buttonToExploreList;
     private VideoView tempVideo;
     private int REQUEST_ALL = 200;
+    private int REQUEST_STOARGE = 977;
     private int REQUEST_EXPLORE_ACTIVITY = 1022;
     private final String [] all_permissions = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CheckVersionUpdate();
 
 
 //        // Check if the user has logged in before
@@ -54,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
 //        prefs.edit().putString("username", getString(R.string.default_usename)).commit();
         // Continue with rendering the MainActivity page
         setContentView(R.layout.activity_main);
+
+
 
 
 
@@ -91,6 +98,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    private void CheckVersionUpdate(){
+        AppUpdate appupdate = new AppUpdate(this);
+        appupdate.setContext(getApplicationContext());
+        appupdate.setVersion(Integer.parseInt(getString(R.string.app_version)));
+        appupdate.setUrl(getString(R.string.url_media_service));
+        appupdate.setREQUEST_STOARGE(REQUEST_STOARGE);
+        appupdate.execute();
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -107,6 +123,20 @@ public class MainActivity extends AppCompatActivity {
                 goToExploreListActivity();
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_STOARGE) {
+            // Check if all required permissions are granted, including media & location
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                CheckVersionUpdate();
+            } else {
+                ToastHelper.showLongToast(this, "Storage permission missing. Fail to update", Toast.LENGTH_SHORT);
             }
         }
     }

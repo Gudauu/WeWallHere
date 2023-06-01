@@ -60,7 +60,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
     private double latitude = 31;
     private double longitude = 121;
     private double ll_delta = 1;
-    private double[] distances_ll = new double[]{0.001, 0.02, 1, 10, 200};
+    private double[] distances_ll = new double[]{0.001, 0.02, 1, 10, 400};
     private String[] distances = new String[]{"50m","1km","50km", "500km", "ALL"};
 
     @Override

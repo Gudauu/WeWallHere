@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">WeWallHere</string>
+    <string name="app_version">0</string>
+    <string name="url_media_service">http://54.252.196.140:3000/</string>
     <string name="default_usename">PotatoHead</string>
     <string name="default_email">potato_test@mail.com</string>
     <string name="default_email2">potato_test2@mail.com</string>
