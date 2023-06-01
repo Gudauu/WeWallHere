@@ -31,6 +31,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,7 +58,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
     private int REQUEST_SINGLE_LOCATION = 4277;
     private double latitude = 31;
     private double longitude = 121;
-    private double ll_delta = 1;
+    private double ll_delta = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -271,6 +272,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
             public void onResponse(Call<List<MongoMediaEntry>> call, Response<List<MongoMediaEntry>> response) {
                 if (response.isSuccessful()) {
                     List<MongoMediaEntry> mediaEntries = response.body();
+                    Collections.reverse(mediaEntries);
 
                     // Handle the retrieved media entries
                     mongoMetaList.clear();
