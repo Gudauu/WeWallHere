@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-<<<<<<< HEAD
+
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.wewallhere"
     tools:ignore="ExtraText">
-=======
-    package="com.example.wewallhere" >
->>>>>>> main
+
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -28,27 +26,26 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAZA36E9ijEV3gXOwctX56kCufbh-CsTKs" />
         <activity
-<<<<<<< HEAD
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login">
-=======
-            android:name=".Main.MainActivity"
-            android:exported="true" >
->>>>>>> main
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
+
         <activity
             android:name=".IntroductoryActivity"
             android:exported="false">
-=======
+        </activity>
+        <activity
+            android:name=".Main.MainActivity"
+            android:exported="false" />
         <activity android:name=".Upload.UploadActivity" />
         <activity android:name=".Upload.ComposeActivity" />
         <activity android:name=".ExploreByList.ExploreListActivity"/>
@@ -62,13 +59,9 @@
         <activity android:name=".User.PhoneVerificationActivity" />
         <activity android:name=".User.EmailVeriActivity" />
         <activity android:name=".User.InfoHomeActivity" />
->>>>>>> main
 
-        </activity>
-        <activity
-            android:name=".Main.MainActivity"
-            android:exported="false" />
-        <activity android:name=".Upload.UploadActivity" />
+
+
     </application>
 
 </manifest>

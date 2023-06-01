@@ -23,6 +23,7 @@ import com.example.wewallhere.R;
 import com.example.wewallhere.Upload.ComposeActivity;
 import com.example.wewallhere.Upload.UploadActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.JsonObject;
 
 
@@ -56,6 +57,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InfoHomeActivity extends AppCompatActivity {
+    FirebaseAuth auth;
     private ImageView profileImageView;
     private EditText usernameEditText;
     private EditText phoneEditText;
@@ -74,7 +76,6 @@ public class InfoHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_home);
         iniBottomMenu();
-
 
         profileImageView = findViewById(R.id.profile_picture);
         usernameEditText = findViewById(R.id.username);
@@ -322,7 +323,8 @@ public class InfoHomeActivity extends AppCompatActivity {
     private void logout() {
         // Handle the log out button click
         // Start the PhoneVerificationActivity to log out the user
-        Intent intent = new Intent(this, PhoneVerificationActivity.class);
+        // Intent intent = new Intent(this, PhoneVerificationActivity.class);
+
         startActivity(intent);
         finish(); // Optional: Finish the current activity to prevent the user from coming back here after logging out
     }
