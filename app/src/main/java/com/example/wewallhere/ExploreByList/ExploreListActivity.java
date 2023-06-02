@@ -113,6 +113,7 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
                     Intent listIntent = new Intent(ExploreListActivity.this, ExploreMapActivity.class);
                     listIntent.putExtra("self_only", self_only);
                     startActivity(listIntent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 }
             }
 
@@ -206,12 +207,15 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
 
             if (itemId == R.id.upload) {
                 startActivity(new Intent(ExploreListActivity.this, UploadActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }  else if (itemId == R.id.info) {
                 startActivity(new Intent(ExploreListActivity.this, InfoHomeActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }  else if (itemId == R.id.explore && self_only) {  // it's viewing history in info tag actually.
                 startActivity(new Intent(ExploreListActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }
 //            } else if (itemId == R.id.navigation_item3) {
@@ -368,6 +372,10 @@ public class ExploreListActivity extends AppCompatActivity  implements SingleLoc
                 ToastHelper.showLongToast(this, "Location permission not granted. \nRecommended location used.", Toast.LENGTH_LONG);
             }
         }
+    }
+    @Override
+    public void onBackPressed() {
+        // do nothing
     }
 
 

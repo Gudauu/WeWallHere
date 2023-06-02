@@ -86,15 +86,13 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
 
             if (itemId == R.id.explore) {
                 startActivity(new Intent(UploadActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             } else if (itemId == R.id.info) {
                 startActivity(new Intent(UploadActivity.this, InfoHomeActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }
-//            } else if (itemId == R.id.navigation_item3) {
-//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
-//                return true;
-//            }
 
             return false;
         });
@@ -223,6 +221,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                             intent.putExtra("latitude", latitude);
                             intent.putExtra("longitude", longitude);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
 //                    uploadImageToServer(selectedImageUri, latitude, longitude);
@@ -249,6 +248,10 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                 }
             });
         }
+    }
+    @Override
+    public void onBackPressed() {
+        // do nothing
     }
 
 

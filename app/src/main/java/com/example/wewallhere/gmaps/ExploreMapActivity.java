@@ -212,12 +212,15 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
 
             if (itemId == R.id.upload) {
                 startActivity(new Intent(ExploreMapActivity.this, UploadActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }  else if (itemId == R.id.info) {
                 startActivity(new Intent(ExploreMapActivity.this, InfoHomeActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }  else if (itemId == R.id.explore && self_only) {  // it's viewing history in info tag actually.
                 startActivity(new Intent(ExploreMapActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }
 //            } else if (itemId == R.id.navigation_item3) {
@@ -239,6 +242,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
             Intent intent = new Intent();
             intent.setClass(ExploreMapActivity.this, ExploreListActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             return;
         }
         // Enable the "My Location" button
@@ -427,6 +431,7 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 // Pass the selected media entry as an extra to the new activity
                 intent.putExtra("MongoMediaEntry", media);
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }
@@ -442,14 +447,13 @@ public class ExploreMapActivity extends AppCompatActivity implements OnMapReadyC
                 coarse_location == PackageManager.PERMISSION_GRANTED;
     }
 
-//    // go to main page when scrolling back
-//    @Override
-//    public void onBackPressed() {
-//        // Start the main activity or perform any other navigation action
+    @Override
+    public void onBackPressed() {
 //        Intent intent = new Intent(this, MainActivity.class);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
 //        startActivity(intent);
-//    }
+        // do nothing
+    }
 
     @Override
     protected void onResume() {

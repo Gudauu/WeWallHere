@@ -38,6 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
         if(currentUser != null){
             Intent intent = new Intent(getApplicationContext(), ExploreListActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         }
     }
@@ -58,6 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
         });
@@ -92,6 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     SaveEmailToSharedPref(email);
                                     Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                     startActivity(intent);
+                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                     finish();
                                 } else {
                                     // If sign in fails, display a message to the user.

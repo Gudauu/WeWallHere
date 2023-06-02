@@ -324,6 +324,8 @@ public class DetailPageActivity extends AppCompatActivity {
                         Intent intent = new Intent(DetailPageActivity.this, ExploreListActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear all previous activities
                         startActivity(intent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
                     } else {
                         // Handle error response
                         Toast.makeText(DetailPageActivity.this, "Delete operation failed:", Toast.LENGTH_SHORT).show();

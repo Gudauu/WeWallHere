@@ -66,15 +66,12 @@ public class InfoHomeActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText phoneEditText;
     private TextView emailTextView;
-    private Button historyButton;
-    private Button saveButton;
-    private Button logoutButton;
     private UserInfo userInfo;
     private Uri pfp_uri; // only useful at first selection
-    private String url_media_service = "http://54.252.196.140:3000/";
-    private String url_download = "http://54.252.196.140:3000/download/";
-    private int REQUEST_IMAGE_PICK = 8762;
-    private int REQUEST_STOARGE = 8763;
+    private String url_media_service;
+    private String url_download;
+    private final int REQUEST_IMAGE_PICK = 8762;
+    private final int REQUEST_STOARGE = 8763;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,19 +79,22 @@ public class InfoHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info_home);
         iniBottomMenu();
 
+        url_media_service = getString(R.string.url_media_service);
+        url_download = url_media_service + "download/";
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         profileImageView = findViewById(R.id.profile_picture);
         usernameEditText = findViewById(R.id.username);
         phoneEditText = findViewById(R.id.phone);
         emailTextView = findViewById(R.id.email);
-        historyButton = findViewById(R.id.history);
-        saveButton = findViewById(R.id.save_info_button);
-        logoutButton = findViewById(R.id.log_out_button);
+        Button historyButton = findViewById(R.id.history);
+        Button saveButton = findViewById(R.id.save_info_button);
+        Button logoutButton = findViewById(R.id.log_out_button);
 
         if (user == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         } else {
             fetchUserInfo();
@@ -113,6 +113,7 @@ public class InfoHomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(InfoHomeActivity.this, ExploreListActivity.class);
                 intent.putExtra("self_only", true); // Replace true with the actual boolean value
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -144,15 +145,13 @@ public class InfoHomeActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.upload) {
                 startActivity(new Intent(InfoHomeActivity.this, UploadActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }  else if (itemId == R.id.explore) {
                 startActivity(new Intent(InfoHomeActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }
-//            } else if (itemId == R.id.navigation_item3) {
-//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
-//                return true;
-//            }
 
             return false;
         });
@@ -390,6 +389,7 @@ public class InfoHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish(); // Optional: Finish the current activity to prevent the user from coming back here after logging out
     }
 
@@ -485,6 +485,11 @@ public class InfoHomeActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // do nothing
     }
 
 }
