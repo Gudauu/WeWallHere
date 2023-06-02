@@ -30,8 +30,8 @@ public class IntroductoryActivity extends AppCompatActivity {
         logo.animate().translationY(1850).setDuration(1000).setStartDelay(4000);
         lottieAnimationView.animate().translationY(1600).setDuration(1000).setStartDelay(4000);
 
-//        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-//        startActivity(intent);
-//        finish();
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
