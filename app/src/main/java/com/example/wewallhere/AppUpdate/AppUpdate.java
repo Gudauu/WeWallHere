@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
+
 import com.example.wewallhere.R;
 import com.example.wewallhere.User.InfoHomeActivity;
 
@@ -123,13 +125,17 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
         }
     }
 
+    private String geneAppDownloadName(){
+        return "WeWallHere_" + newVersion + "_" + System.currentTimeMillis() + ".apk";
+    }
+
     private void InstallApp() {
         try {
             ToggleFreezeUserInteraction(true);
 
             //get destination to update file and set Uri
             String destination = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/";
-            String fileName = "WeWallHere_" + newVersion + ".apk";
+            String fileName = geneAppDownloadName();
             destination += fileName;
 
             //Delete update file if exists
