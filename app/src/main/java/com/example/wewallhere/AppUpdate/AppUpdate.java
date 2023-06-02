@@ -222,6 +222,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
         alertDialog.setButton(Dialog.BUTTON_NEGATIVE, "NO", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                ToggleFreezeUserInteraction(false);
                 return;
             }
         });
