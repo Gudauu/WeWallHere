@@ -9,8 +9,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$USER_HOME$/Documents/School/year4/second/mobile/WeWallHere" />
+            <option value="$USER_HOME$/Documents/School/year4/second/mobile/WeWallHere/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

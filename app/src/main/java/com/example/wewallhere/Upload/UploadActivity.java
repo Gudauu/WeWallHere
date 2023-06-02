@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -86,15 +87,13 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
 
             if (itemId == R.id.explore) {
                 startActivity(new Intent(UploadActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             } else if (itemId == R.id.info) {
                 startActivity(new Intent(UploadActivity.this, InfoHomeActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }
-//            } else if (itemId == R.id.navigation_item3) {
-//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
-//                return true;
-//            }
 
             return false;
         });
@@ -135,6 +134,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                     startVideoPickerIntent();
                 }
             } else {
+                ToggleFreezeUserInteraction(false);
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
             }
         }
@@ -144,6 +144,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
     ////// media
     // media: check permission Select image & video from gallery
     private void selectImagePermissionCheck() {
+        ToggleFreezeUserInteraction(true);
         // Check if the required permission to read external storage is granted
         if (checkImagePermission() && checkSingleLocationPermission()) {
             startImagePickerIntent();
@@ -158,6 +159,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
         }
     }
     private void selectVideoPermissionCheck() {
+        ToggleFreezeUserInteraction(true);
         // Check if the necessary permissions are granted
         if (checkVideoPermission() && checkSingleLocationPermission()) {
             // Permissions are already granted, open the video selection intent
@@ -208,6 +210,7 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        ToggleFreezeUserInteraction(true);
         if (requestCode == REQUEST_IMAGE_PICK_SEND && resultCode == RESULT_OK && data != null) {
             Uri selectedImageUri = data.getData();
             // Call getLocation and then upload the image
@@ -222,7 +225,9 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                             intent.putExtra("Uri", selectedImageUri);
                             intent.putExtra("latitude", latitude);
                             intent.putExtra("longitude", longitude);
+                            ToggleFreezeUserInteraction(false);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
 //                    uploadImageToServer(selectedImageUri, latitude, longitude);
@@ -242,13 +247,33 @@ public class UploadActivity extends AppCompatActivity implements SingleLocation.
                             intent.putExtra("Uri", selectedVideoUri);
                             intent.putExtra("latitude", latitude);
                             intent.putExtra("longitude", longitude);
+                            ToggleFreezeUserInteraction(false);
                             startActivity(intent);
                         }
                     });
 //                    uploadVideoToServer(selectedVideoUri, latitude, longitude);
                 }
             });
+        } else{  // user cancelled selection
+            ToggleFreezeUserInteraction(false);
         }
+    }
+    private void ToggleFreezeUserInteraction(boolean start) {
+        if (start) {  // freeze
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            (this).findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+
+
+        } else {  //unfreeze
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            //start loading icon
+            this.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        // do nothing
     }
 
 

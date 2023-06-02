@@ -127,6 +127,7 @@ public class ComposeActivity extends AppCompatActivity {
                         Toast.makeText(ComposeActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ComposeActivity.this, UploadActivity.class);
                         startActivity(intent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     } else {
                         // Handle error response
                         Toast.makeText(ComposeActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
@@ -200,6 +201,7 @@ public class ComposeActivity extends AppCompatActivity {
                         Toast.makeText(ComposeActivity.this, "Video uploaded successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ComposeActivity.this, UploadActivity.class);
                         startActivity(intent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     } else {
                         // Video upload failed
                         Toast.makeText(ComposeActivity.this, "video upload failed:", Toast.LENGTH_SHORT).show();

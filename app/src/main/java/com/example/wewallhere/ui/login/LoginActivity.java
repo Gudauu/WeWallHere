@@ -120,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
     private void goToExploreList(){
         Intent intent = new Intent(getApplicationContext(), ExploreListActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
     }
 

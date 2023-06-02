@@ -58,8 +58,8 @@
         <!-- User profile pic -->
         <ImageView
             android:id="@+id/imageViewProfilePic"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_launcher_foreground"/>
 
         <LinearLayout

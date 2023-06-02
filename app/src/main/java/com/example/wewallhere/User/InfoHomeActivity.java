@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.wewallhere.AppUpdate.AppUpdate;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.ui.login.LoginActivity;
@@ -65,14 +67,12 @@ public class InfoHomeActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText phoneEditText;
     private TextView emailTextView;
-    private Button historyButton;
-    private Button saveButton;
-    private Button logoutButton;
     private UserInfo userInfo;
     private Uri pfp_uri; // only useful at first selection
-    private String url_media_service = "http://54.252.196.140:3000/";
-    private String url_download = "http://54.252.196.140:3000/download/";
-    private int REQUEST_IMAGE_PICK = 8762;
+    private String url_media_service;
+    private String url_download;
+    private final int REQUEST_IMAGE_PICK = 8762;
+    private final int REQUEST_STOARGE = 8763;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,19 +80,22 @@ public class InfoHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info_home);
         iniBottomMenu();
 
+        url_media_service = getString(R.string.url_media_service);
+        url_download = url_media_service + "download/";
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         profileImageView = findViewById(R.id.profile_picture);
         usernameEditText = findViewById(R.id.username);
         phoneEditText = findViewById(R.id.phone);
         emailTextView = findViewById(R.id.email);
-        historyButton = findViewById(R.id.history);
-        saveButton = findViewById(R.id.save_info_button);
-        logoutButton = findViewById(R.id.log_out_button);
+        Button historyButton = findViewById(R.id.history);
+        Button saveButton = findViewById(R.id.save_info_button);
+        Button logoutButton = findViewById(R.id.log_out_button);
 
         if (user == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         } else {
             fetchUserInfo();
@@ -111,6 +114,7 @@ public class InfoHomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(InfoHomeActivity.this, ExploreListActivity.class);
                 intent.putExtra("self_only", true); // Replace true with the actual boolean value
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -125,6 +129,13 @@ public class InfoHomeActivity extends AppCompatActivity {
                 logout();
             }
         });
+        Button updateButton = findViewById(R.id.checkUpdate);
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppUpdatePermissionCheck();
+            }
+        });
     }
 
 
@@ -135,19 +146,48 @@ public class InfoHomeActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.upload) {
                 startActivity(new Intent(InfoHomeActivity.this, UploadActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }  else if (itemId == R.id.explore) {
                 startActivity(new Intent(InfoHomeActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             }
-//            } else if (itemId == R.id.navigation_item3) {
-//                startActivity(new Intent(CurrentActivity.this, Activity3.class));
-//                return true;
-//            }
 
             return false;
         });
 
+    }
+
+    private void AppUpdatePermissionCheck(){
+        ToggleFreezeUserInteraction(true);
+        if(checkStoragePermission()){
+            Update();
+        } else{
+            askForStoragePermission();
+        }
+    }
+
+    private void Update(){
+        AppUpdate appupdate = new AppUpdate(this);
+        appupdate.setContext(getApplicationContext());
+        appupdate.setUrl(getString(R.string.url_media_service));
+        appupdate.setVersion(Integer.parseInt(getString(R.string.app_version)));
+        appupdate.execute();
+    }
+
+    private boolean checkStoragePermission(){
+        return ActivityCompat.checkSelfPermission(InfoHomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(InfoHomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void askForStoragePermission(){
+        // Request the necessary permissions
+        String[] permissions = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+        ActivityCompat.requestPermissions(InfoHomeActivity.this, permissions, REQUEST_STOARGE);
     }
 
 
@@ -351,6 +391,7 @@ public class InfoHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish(); // Optional: Finish the current activity to prevent the user from coming back here after logging out
     }
 
@@ -400,6 +441,20 @@ public class InfoHomeActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == REQUEST_STOARGE) {
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                Update();
+            } else {
+                ToggleFreezeUserInteraction(false);
+                Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     @Override
@@ -434,6 +489,25 @@ public class InfoHomeActivity extends AppCompatActivity {
         }
         return true;
     }
+    private void ToggleFreezeUserInteraction(boolean start) {
+        if (start) {  // freeze
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            (this).findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+
+
+        } else {  //unfreeze
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            //start loading icon
+            this.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // do nothing
+    }
+
 
 }
 
