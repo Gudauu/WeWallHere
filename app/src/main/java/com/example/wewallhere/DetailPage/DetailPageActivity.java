@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,6 +80,7 @@ public class DetailPageActivity extends AppCompatActivity {
     // Declare the dialog and its views
     private Dialog commentDialog;
     private EditText editTextComment;
+    private RadioGroup radioGroup;
     private RadioButton radioButtonImage;
     private RadioButton radioButtonVideo;
     private Button buttonUploadMedia;
@@ -224,10 +226,12 @@ public class DetailPageActivity extends AppCompatActivity {
     private void iniCommentDialog(MongoMediaEntry mongoEntry){
         comment_type = TYPE_TEXT;
         comment_media_uri = null;
+
         commentDialog = new Dialog(this);
         commentDialog.setContentView(R.layout.dialog_comment);
 
         editTextComment = commentDialog.findViewById(R.id.editTextComment);
+        radioGroup = commentDialog.findViewById(R.id.radioGroup);
         radioButtonImage = commentDialog.findViewById(R.id.radioButtonImage);
         radioButtonVideo = commentDialog.findViewById(R.id.radioButtonVideo);
         buttonUploadMedia = commentDialog.findViewById(R.id.buttonUploadMedia);
@@ -412,7 +416,12 @@ public class DetailPageActivity extends AppCompatActivity {
             buttonSubmit.setFocusable(true);
         }
     }
-
+    private void clearUpComment(){
+        editTextComment.setText("");
+        radioGroup.clearCheck();
+        comment_type = TYPE_TEXT;
+        comment_media_uri = null;
+    }
     private void uploadImageCommentToServer(String replyID, Uri imageUri, String title, String content) {
         try {
             // Create a Retrofit instance
@@ -450,6 +459,8 @@ public class DetailPageActivity extends AppCompatActivity {
                         // Image uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
                         updateComment();
+                        toggleFreezeAndLoad(false);
+                        clearUpComment();
                         commentDialog.dismiss();
                     } else {
                         // Handle error response
@@ -502,6 +513,8 @@ public class DetailPageActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
                         updateComment();
+                        clearUpComment();
+                        toggleFreezeAndLoad(false);
                         commentDialog.dismiss();
                     } else {
                         // Handle error response
@@ -572,6 +585,8 @@ public class DetailPageActivity extends AppCompatActivity {
                         // Video uploaded successfully
                         Toast.makeText(DetailPageActivity.this, "Comment posted.", Toast.LENGTH_SHORT).show();
                         updateComment();
+                        clearUpComment();
+                        toggleFreezeAndLoad(false);
                         commentDialog.dismiss();
                     } else {
                         toggleFreezeAndLoad(false);
