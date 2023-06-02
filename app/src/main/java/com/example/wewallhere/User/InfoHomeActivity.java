@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -159,6 +160,7 @@ public class InfoHomeActivity extends AppCompatActivity {
     }
 
     private void AppUpdatePermissionCheck(){
+        ToggleFreezeUserInteraction(true);
         if(checkStoragePermission()){
             Update();
         } else{
@@ -450,6 +452,7 @@ public class InfoHomeActivity extends AppCompatActivity {
             if (allPermissionsGranted) {
                 Update();
             } else {
+                ToggleFreezeUserInteraction(false);
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
             }
         }
@@ -486,11 +489,25 @@ public class InfoHomeActivity extends AppCompatActivity {
         }
         return true;
     }
+    private void ToggleFreezeUserInteraction(boolean start) {
+        if (start) {  // freeze
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            (this).findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+
+
+        } else {  //unfreeze
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            //start loading icon
+            this.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
+    }
 
     @Override
     public void onBackPressed() {
         // do nothing
     }
+
 
 }
 

@@ -43,6 +43,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
     private Context context;
     private Activity activity;
     private int appVersion;
+    private int newVersion;
     private String url_media_service;
     private AlertDialog alertDialog;
 
@@ -83,6 +84,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
         if (content == null)
             return false;  // if fail to load anything, simply abort
         int latest_version = Integer.parseInt(content);
+        newVersion = latest_version;
         return latest_version == appVersion;
 
     }
@@ -101,7 +103,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ToastHelper.showLongToast(context, "AUtoupdate failed with: " + errorMessage, Toast.LENGTH_LONG);
+                ToastHelper.showLongToast(context, "Autoupdate failed with: " + errorMessage, Toast.LENGTH_LONG);
             }
         });
     }
@@ -127,7 +129,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
 
             //get destination to update file and set Uri
             String destination = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/";
-            String fileName = "WeWallHere.apk";
+            String fileName = "WeWallHere_" + newVersion + ".apk";
             destination += fileName;
 
             //Delete update file if exists
@@ -141,7 +143,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
                     new File(destination));
 
             //get url of app on server
-            String url = url_media_service + "/download";
+            String url = url_media_service + "download";
 
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 //        request.setDescription(Main.this.getString(R.string.notification_description));
@@ -177,6 +179,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
             //register receiver for when .apk download is compete
             context.registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         } catch (Exception e) {
+            ToggleFreezeUserInteraction(false);
             e.printStackTrace();
             HandleInstallFailure(e.getMessage());
         }
