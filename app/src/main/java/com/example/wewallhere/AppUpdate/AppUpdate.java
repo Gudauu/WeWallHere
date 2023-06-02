@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import com.example.wewallhere.R;
+import com.example.wewallhere.User.InfoHomeActivity;
 
 import Helper.ToastHelper;
 
@@ -44,7 +45,6 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
     private int appVersion;
     private String url_media_service;
     private AlertDialog alertDialog;
-    private int REQUEST_STOARGE;
 
     public void setContext(Context contextf) {
         context = contextf;
@@ -52,10 +52,6 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
 
     public void setVersion(int v) {
         appVersion = v;
-    }
-
-    public void setREQUEST_STOARGE(int v) {
-        REQUEST_STOARGE = v;
     }
 
     public void setUrl(String u) {
@@ -197,8 +193,10 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        if (result == "noinstall")
+        if (result == "noinstall"){
+            ToastHelper.showLongToast(activity, "Already up to date.", Toast.LENGTH_SHORT);
             return;
+        }
         alertDialog.setMessage("New version is available.\nUpdate now?");
         alertDialog.setCancelable(false);
         alertDialog.setButton(Dialog.BUTTON_POSITIVE, "YES", new DialogInterface.OnClickListener() {
@@ -208,8 +206,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
                 if (checkStoragePermission()) {
                     InstallApp();
                 } else {
-                    askForStoragePermission();
-//                    Toast.makeText(activity, "Storage permission missing.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Storage permission missing.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -231,14 +228,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void askForStoragePermission(){
-        // Request the necessary permissions
-        String[] permissions = new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-        };
-        ActivityCompat.requestPermissions(activity, permissions, REQUEST_STOARGE);
-    }
+
 
 
     @Override

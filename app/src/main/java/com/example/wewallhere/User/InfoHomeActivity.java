@@ -74,6 +74,7 @@ public class InfoHomeActivity extends AppCompatActivity {
     private String url_media_service = "http://54.252.196.140:3000/";
     private String url_download = "http://54.252.196.140:3000/download/";
     private int REQUEST_IMAGE_PICK = 8762;
+    private int REQUEST_STOARGE = 8763;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +127,13 @@ public class InfoHomeActivity extends AppCompatActivity {
                 logout();
             }
         });
+        Button updateButton = findViewById(R.id.checkUpdate);
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppUpdatePermissionCheck();
+            }
+        });
     }
 
 
@@ -151,14 +159,34 @@ public class InfoHomeActivity extends AppCompatActivity {
 
     }
 
-    private void iniCheckAppUpdate(){
-        Button updateButton = findViewById(R.id.checkUpdate);
+    private void AppUpdatePermissionCheck(){
+        if(checkStoragePermission()){
+            Update();
+        } else{
+            askForStoragePermission();
+        }
     }
 
     private void Update(){
         AppUpdate appupdate = new AppUpdate(this);
         appupdate.setContext(getApplicationContext());
+        appupdate.setUrl(getString(R.string.url_media_service));
+        appupdate.setVersion(Integer.parseInt(getString(R.string.app_version)));
         appupdate.execute();
+    }
+
+    private boolean checkStoragePermission(){
+        return ActivityCompat.checkSelfPermission(InfoHomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(InfoHomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void askForStoragePermission(){
+        // Request the necessary permissions
+        String[] permissions = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+        ActivityCompat.requestPermissions(InfoHomeActivity.this, permissions, REQUEST_STOARGE);
     }
 
 
@@ -408,6 +436,19 @@ public class InfoHomeActivity extends AppCompatActivity {
             }
             if (allPermissionsGranted) {
                 startImagePickerIntent();
+            } else {
+                Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_STOARGE) {
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                Update();
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show();
             }
