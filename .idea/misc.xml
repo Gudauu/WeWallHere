@@ -3,12 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/activity_compose.xml" value="0.5958333333333333" />
         <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/activity_explore_list.xml" value="0.66875" />
+        <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/activity_info_home.xml" value="0.5958333333333333" />
         <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/activity_login.xml" value="0.36875" />
         <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/activity_main.xml" value="0.66875" />
         <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/activity_upload.xml" value="0.66875" />
         <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/layout_top_menu.xml" value="0.28072916666666664" />
         <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/layout/toast_custom.xml" value="0.66875" />
+        <entry key="../../../Documents/School/year4/second/mobile/WeWallHere/app/src/main/res/xml/provider_paths.xml" value="0.4276041666666667" />
       </map>
     </option>
   </component>

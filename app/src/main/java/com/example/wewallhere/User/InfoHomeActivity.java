@@ -18,6 +18,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.wewallhere.AppUpdate.AppUpdate;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
 import com.example.wewallhere.ui.login.LoginActivity;
@@ -148,6 +149,16 @@ public class InfoHomeActivity extends AppCompatActivity {
             return false;
         });
 
+    }
+
+    private void iniCheckAppUpdate(){
+        Button updateButton = findViewById(R.id.checkUpdate);
+    }
+
+    private void Update(){
+        AppUpdate appupdate = new AppUpdate(this);
+        appupdate.setContext(getApplicationContext());
+        appupdate.execute();
     }
 
 

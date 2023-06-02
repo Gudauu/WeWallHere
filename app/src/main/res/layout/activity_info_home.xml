@@ -5,6 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".User.InfoHomeActivity">
+    <!-- Add the loading panel -->
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminate="true" />
+    </RelativeLayout>
     <!-- Profile Picture and Username -->
     <LinearLayout
         android:id="@+id/profile_info_layout"
@@ -27,6 +40,7 @@
             android:layout_height="wrap_content"
             android:hint="Username"
             android:text="PotatoHead"
+
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -88,6 +102,13 @@
         android:layout_below="@id/phone_layout"
         android:text="View my posts"
         android:layout_margin="16dp"/>
+    <Button
+        android:id="@+id/checkUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/history"
+        android:text="Check updates"
+        android:layout_margin="16dp"/>
 
     <!-- Save Info and Log Out Buttons -->
     <LinearLayout
@@ -111,8 +132,8 @@
             android:layout_height="wrap_content"
             android:text="Log Out"
             android:layout_marginStart="16dp" />
-
     </LinearLayout>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
