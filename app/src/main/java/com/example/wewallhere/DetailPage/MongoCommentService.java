@@ -11,4 +11,9 @@ public interface MongoCommentService{
     Call<List<MongoCommentEntry>> getCommentMetaList(
             @Path("ID_reply") String ID_reply
     );
+    @GET("mongometa/comment/history/{email}")
+    Call<List<MongoCommentEntry>> getHistoryCommentMetaList(
+            @Path("email") String email
+    );
+
 }

@@ -1,6 +1,7 @@
 package com.example.wewallhere.User;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.wewallhere.AppUpdate.AppUpdate;
 import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.R;
+import com.example.wewallhere.ViewHistory.ViewCommentsActivity;
 import com.example.wewallhere.ui.login.LoginActivity;
 import com.example.wewallhere.Upload.ComposeActivity;
 import com.example.wewallhere.Upload.UploadActivity;
@@ -89,6 +91,7 @@ public class InfoHomeActivity extends AppCompatActivity {
         phoneEditText = findViewById(R.id.phone);
         emailTextView = findViewById(R.id.email);
         Button historyButton = findViewById(R.id.history);
+        Button commentsButton = findViewById(R.id.history_comments);
         Button saveButton = findViewById(R.id.save_info_button);
         Button logoutButton = findViewById(R.id.log_out_button);
 
@@ -113,6 +116,15 @@ public class InfoHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(InfoHomeActivity.this, ExploreListActivity.class);
                 intent.putExtra("self_only", true); // Replace true with the actual boolean value
+                startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        });
+        commentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(InfoHomeActivity.this, ViewCommentsActivity.class);
+//                intent.putExtra("self_only", true); // Replace true with the actual boolean value
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }

@@ -102,10 +102,17 @@
         android:text="View my posts"
         android:layout_margin="16dp"/>
     <Button
-        android:id="@+id/checkUpdate"
+        android:id="@+id/history_comments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/history"
+        android:text="View my comments"
+        android:layout_margin="16dp"/>
+    <Button
+        android:id="@+id/checkUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/history_comments"
         android:text="Check updates"
         android:layout_margin="16dp"/>
 
