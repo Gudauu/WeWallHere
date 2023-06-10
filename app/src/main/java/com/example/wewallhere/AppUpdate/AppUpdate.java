@@ -204,6 +204,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
         super.onPostExecute(result);
         if (result == "noinstall"){
             ToastHelper.showLongToast(activity, "Already up to date.", Toast.LENGTH_SHORT);
+            ToggleFreezeUserInteraction(false);
             return;
         }
         alertDialog.setMessage("New version is available.\nUpdate now?");
@@ -215,6 +216,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
                 if (checkStoragePermission()) {
                     InstallApp();
                 } else {
+                    ToggleFreezeUserInteraction(false);
                     Toast.makeText(activity, "Storage permission missing.", Toast.LENGTH_SHORT).show();
                 }
             }
