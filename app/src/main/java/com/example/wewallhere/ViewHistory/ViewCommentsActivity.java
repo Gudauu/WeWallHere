@@ -1,5 +1,6 @@
 package com.example.wewallhere.ViewHistory;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -12,9 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.wewallhere.DetailPage.CommentAdapter;
 import com.example.wewallhere.DetailPage.MongoCommentEntry;
 import com.example.wewallhere.DetailPage.MongoCommentService;
+import com.example.wewallhere.ExploreByList.ExploreListActivity;
 import com.example.wewallhere.ExploreByList.MongoMediaEntry;
 import com.example.wewallhere.R;
+import com.example.wewallhere.Upload.UploadActivity;
+import com.example.wewallhere.User.InfoHomeActivity;
 import com.example.wewallhere.User.UserInfo;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +47,7 @@ public class ViewCommentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_history_comments);
         url_media_service = getString(R.string.url_media_service);
         url_download = url_media_service + "download/";
+        iniBottomMenu();
         // comments
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -90,5 +96,35 @@ public class ViewCommentsActivity extends AppCompatActivity {
         // Create a new adapter with the updated media list
         commentAdapter = new CommentAdapter(mongoCommentList, url_download, getApplicationContext());
         recyclerView.setAdapter(commentAdapter);
+    }
+
+    private void iniBottomMenu(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.info);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.upload) {
+                startActivity(new Intent(ViewCommentsActivity.this, UploadActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                return true;
+            }  else if (itemId == R.id.info) {
+                startActivity(new Intent(ViewCommentsActivity.this, InfoHomeActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                return true;
+            }  else if (itemId == R.id.explore) {  // it's viewing history in info tag actually.
+                startActivity(new Intent(ViewCommentsActivity.this, ExploreListActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                return true;
+            }
+            return false;
+        });
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        // do nothing
     }
 }
