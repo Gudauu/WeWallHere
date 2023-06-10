@@ -30,12 +30,12 @@ import Helper.ToastHelper;
 public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
     private List<MongoCommentEntry> mongocommentEntries;
     private String serverIP;
-    private Context context;
+    private OnReplyClickListener myOnReplyClickListener;
+
 
     public CommentAdapter(List<MongoCommentEntry> mongocommentEntries, String serverIP, Context context) {
         this.mongocommentEntries = mongocommentEntries;
         this.serverIP = serverIP;
-        this.context = context;
     }
 
     @NonNull
@@ -137,13 +137,32 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
         holder.textViewTitle.setText(mongoEntry.getTitle());
         holder.textViewContent.setText(mongoEntry.getContent());
         holder.textViewDate.setText(mongoEntry.getTimestamp());
+
+        holder.replyIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (myOnReplyClickListener != null) {
+                    myOnReplyClickListener.onReplyClick(position);
+                }
+            }
+        });
+
     }
 
+    public interface OnReplyClickListener {
+        void onReplyClick(int position);
+    }
 
     @Override
     public int getItemCount() {
         return mongocommentEntries.size();
     }
+
+    public void setMyOnReplyClickListener(OnReplyClickListener listener) {
+        this.myOnReplyClickListener = listener;
+        String uselss = "pne";
+    }
+
 
 
 }

@@ -62,7 +62,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DetailPageActivity extends AppCompatActivity {
+public class DetailPageActivity extends AppCompatActivity implements CommentAdapter.OnReplyClickListener {
     private MongoMediaEntry mongoMediaEntry;
     private RecyclerView recyclerView;
     private CommentAdapter commentAdapter;
@@ -92,6 +92,7 @@ public class DetailPageActivity extends AppCompatActivity {
     private int TYPE_TEXT = 1;
     private int TYPE_IMAGE = 2;
     private int TYPE_VIDEO = 3;
+    private int reply_position = -1;
     private int comment_type = -1;
 
     @Override
@@ -103,12 +104,29 @@ public class DetailPageActivity extends AppCompatActivity {
 
         initTitleBar(top_mongoEntry.getTitle());
         iniTopMedia(top_mongoEntry);
-        iniCommentDialog(top_mongoEntry);
 
+        iniCommentDialog();
+        // ini top reply dialog
+        reply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
+                String email = prefs.getString("email", getString(R.string.default_email));
+
+                if(email.equals(getString(R.string.admin_email))){
+                    DeletePost(top_mongoEntry);
+                }else{
+                    commentDialog.show();
+                }
+            }
+        });
+
+        // comments
         recyclerView = findViewById(R.id.recyclerViewComments);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         // Create and set the adapter for empty mediaList
         commentAdapter = new CommentAdapter(mongoCommentList, url_download, getApplicationContext());
+        commentAdapter.setMyOnReplyClickListener(this); // 'this' refers to the DetailPageActivity implementing the interface
         recyclerView.setAdapter(commentAdapter);
         updateComment();
     }
@@ -223,7 +241,7 @@ public class DetailPageActivity extends AppCompatActivity {
 
     }
 
-    private void iniCommentDialog(MongoMediaEntry mongoEntry){
+    private void iniCommentDialog(){
         comment_type = TYPE_TEXT;
         comment_media_uri = null;
 
@@ -237,8 +255,6 @@ public class DetailPageActivity extends AppCompatActivity {
         buttonUploadMedia = commentDialog.findViewById(R.id.buttonUploadMedia);
         buttonSubmit = commentDialog.findViewById(R.id.buttonSubmit);
         buttonCancel = commentDialog.findViewById(R.id.buttonCancel);
-
-
 
         buttonUploadMedia.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,20 +271,36 @@ public class DetailPageActivity extends AppCompatActivity {
             }
         });
 
+
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String comment = editTextComment.getText().toString();
+
                 if(comment.length() == 0){
                     ToastHelper.showLongToast(getApplicationContext(), "Please enter comment.", Toast.LENGTH_SHORT);
                     return;
                 }
+
+                // construct the ID and title based on reply position
+                String ID_reply;
+                if(reply_position == -1){
+                    ID_reply = topID;
+                }else{
+                    MongoCommentEntry selectedComment = mongoCommentList.get(reply_position);
+//                    ID_reply = selectedComment.getID();
+                    // Shutong: the detail page comments are fetched with ID_top,
+                    // and using the above 'ID_reply' here isn't useful cuz comments' reply relationship is indicated by title only
+                    ID_reply = topID;
+                }
+                String title = "reply " + Integer.toString(reply_position + 1) ;
+                // upload comment based on media type
                 if(comment_type == TYPE_TEXT){
-                    uploadTextCommentToServer(topID, "reply", comment);
+                    uploadTextCommentToServer(ID_reply, title, comment);
                 }else if(comment_type == TYPE_IMAGE){
-                    uploadImageCommentToServer(topID, comment_media_uri, "reply", comment);
+                    uploadImageCommentToServer(ID_reply, comment_media_uri, title, comment);
                 }else if(comment_type == TYPE_VIDEO){
-                    uploadVideoToServer(topID, comment_media_uri, "reply", comment);
+                    uploadVideoToServer(ID_reply, comment_media_uri, title, comment);
                 }
                 // Handle the submission of the comment and selected media
 //                commentDialog.dismiss();
@@ -283,21 +315,17 @@ public class DetailPageActivity extends AppCompatActivity {
             }
         });
 
-        reply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences prefs = getSharedPreferences("INFO", MODE_PRIVATE);
-                String email = prefs.getString("email", getString(R.string.default_email));
+    }
 
-                if(email.equals(getString(R.string.admin_email))){
-                    DeletePost(mongoEntry);
-                }else{
-                    commentDialog.show();
-                }
-            }
-        });
+    @Override
+    public void onReplyClick(int position) {
+        // Retrieve the selected comment from the comment list using the position
+//        MongoCommentEntry selectedComment = mongoCommentList.get(position);
+//        Comment selectedComment = commentList.get(position);
 
-
+        // Show the reply dialog for the selected comment
+        reply_position = position;
+        commentDialog.show();
     }
 
     private void DeletePost(MongoMediaEntry mongoEntry){
@@ -387,6 +415,7 @@ public class DetailPageActivity extends AppCompatActivity {
     private void updateRecyclerView() {
         // Create a new adapter with the updated media list
         commentAdapter = new CommentAdapter(mongoCommentList, url_download, getApplicationContext());
+        commentAdapter.setMyOnReplyClickListener(this); // 'this' refers to the DetailPageActivity implementing the interface
         recyclerView.setAdapter(commentAdapter);
     }
     private void initTitleBar(String title){
@@ -497,7 +526,7 @@ public class DetailPageActivity extends AppCompatActivity {
             JsonObject data = new JsonObject();
             data.addProperty("ID", geneUniqueID());
             data.addProperty("ID_reply", replyID);
-            data.addProperty("title", "reply");
+            data.addProperty("title", title);
             data.addProperty("content", content);
             data.addProperty("username", prefs.getString("username", getString(R.string.default_username)));
             data.addProperty("email", prefs.getString("email", getString(R.string.default_email)));

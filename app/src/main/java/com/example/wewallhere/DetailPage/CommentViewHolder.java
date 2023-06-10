@@ -20,6 +20,7 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
     public TextView textViewContent;
     public TextView textViewUploader;
     public TextView textViewDate;
+    public ImageView replyIcon;
     public RelativeLayout loadingPanel;
 
 
@@ -34,6 +35,7 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
         imageViewThumbnail = itemView.findViewById(R.id.imageViewThumbnail);
         loadingPanel = itemView.findViewById(R.id.loadingPanel);
+        replyIcon = itemView.findViewById(R.id.reply);
 
     }
 
