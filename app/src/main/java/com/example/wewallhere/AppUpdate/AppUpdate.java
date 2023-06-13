@@ -203,7 +203,7 @@ public class AppUpdate extends AsyncTask<String,Void,String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         if (result == "noinstall"){
-            ToastHelper.showLongToast(activity, "Already up to date.", Toast.LENGTH_SHORT);
+            Toast.makeText(activity, "Already up to date.", Toast.LENGTH_SHORT).show();
             ToggleFreezeUserInteraction(false);
             return;
         }
