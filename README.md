@@ -1,5 +1,5 @@
 # WeWallHere
-
+![Alt Text](https://github.com/Gudauu/WeWallHere/blob/develop/logo_github.png?raw=true)
 
 ## 1. OVERVIEW
 A class project for the mobile networking course at Fudan University.
